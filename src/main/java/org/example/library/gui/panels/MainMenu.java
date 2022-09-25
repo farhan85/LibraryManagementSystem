@@ -6,16 +6,22 @@ import com.googlecode.lanterna.gui2.EmptySpace;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.Panel;
+import org.example.library.gui.MainWindow;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MainMenu extends Panel {
 
-    public MainMenu() {
+    private final MainWindow mainWindow;
+
+    public MainMenu(final MainWindow mainWindow) {
+        this.mainWindow = checkNotNull(mainWindow);
         initialize();
     }
 
     public void initialize() {
         final ActionListBox actionListBox = new ActionListBox();
-        actionListBox.addItem("Create Author", () -> {});
+        actionListBox.addItem("Create Author", mainWindow::displayCreateAuthor);
         actionListBox.addItem("List Authors", () -> {});
         actionListBox.addItem("Update Author", () -> {});
         actionListBox.addItem("Delete Author", () -> {});

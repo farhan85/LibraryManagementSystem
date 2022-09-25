@@ -10,10 +10,14 @@ import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import org.example.library.dao.ResourceDao;
 import org.example.library.gui.MainWindow;
 import org.example.library.guice.LocalDaoModule;
+import org.example.library.models.Author;
 
 import java.io.IOException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Runs the Library Management System application.
@@ -25,10 +29,12 @@ public class MainApp {
     private final MainWindow mainWindow;
 
     @Inject
-    private MainApp() throws IOException {
+    private MainApp(final ResourceDao<Author> authorDao) throws IOException {
+        checkNotNull(authorDao);
+
         screen = new DefaultTerminalFactory().createScreen();
         textGUI = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.BLUE));
-        mainWindow = new MainWindow();
+        mainWindow = new MainWindow(authorDao);
     }
 
     public void run() throws IOException {
