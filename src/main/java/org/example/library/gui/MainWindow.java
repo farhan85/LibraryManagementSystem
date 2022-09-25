@@ -22,7 +22,7 @@ public class MainWindow extends BasicWindow {
         setHints(List.of(Window.Hint.CENTERED));
         setFixedSize(new TerminalSize(50, 15));
 
-        this.mainMenu = new MainMenu(this);
+        this.mainMenu = new MainMenu(this, authorDao);
         this.createAuthor = new CreateAuthor(this, authorDao);
         this.listAuthors = new ListAuthors(this, authorDao);
     }
