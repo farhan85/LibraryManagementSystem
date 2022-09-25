@@ -33,7 +33,7 @@ public class MainMenu extends Panel {
         actionListBox.addItem("Create Author", mainWindow::displayCreateAuthor);
         actionListBox.addItem("List Authors", mainWindow::displayListAuthors);
         actionListBox.addItem("Update Author", () -> {});
-        actionListBox.addItem("Delete Author", () -> {});
+        actionListBox.addItem("Delete Author", mainWindow::displayDeleteAuthor);
         actionListBox.addItem("Load test data", this::loadTestData);
         actionListBox.addItem("Exit", () -> System.exit(0));
 

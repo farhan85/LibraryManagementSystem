@@ -7,6 +7,7 @@ import org.example.library.models.Author;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,9 +29,18 @@ public class AuthorTable extends Table<String> {
         authorDao.scan(author -> tableModel.addRow(authorToList(author)));
     }
 
+    public UUID getSelectedAuthor() {
+        final String authorId = tableModel.getCell(0, getSelectedRow());
+        return UUID.fromString(authorId);
+    }
+
+    public int size() {
+        return tableModel.getRowCount();
+    }
+
     private Collection<String> authorToList(final Author author) {
         return List.of(
-                author.getId().toString().substring(0, 6) + "...",
+                author.getId().toString(),
                 author.getFirstName(),
                 author.getLastName());
     }
