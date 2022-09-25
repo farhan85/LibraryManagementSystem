@@ -28,7 +28,10 @@ public class AwsClientModule extends AbstractModule {
     }
 
     public AwsClientModule() {
-        this.region = Stream.of(System.getProperty("region"), System.getenv("AWS_DEFAULT_REGION"))
+        this.region = Stream.of(
+                        System.getProperty("region"),
+                        System.getenv("AWS_REGION"),
+                        System.getenv("AWS_DEFAULT_REGION"))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .map(Regions::fromName)
@@ -47,7 +50,7 @@ public class AwsClientModule extends AbstractModule {
     }
 
     @Provides
-    public AmazonDynamoDB AmazonDynamoDB(final AWSCredentialsProvider credentials) {
+    public AmazonDynamoDB provideAmazonDynamoDB(final AWSCredentialsProvider credentials) {
         return AmazonDynamoDBClient.builder()
                 .withCredentials(credentials)
                 .withRegion(region)
