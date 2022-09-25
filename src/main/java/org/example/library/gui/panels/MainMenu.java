@@ -22,7 +22,7 @@ public class MainMenu extends Panel {
     public void initialize() {
         final ActionListBox actionListBox = new ActionListBox();
         actionListBox.addItem("Create Author", mainWindow::displayCreateAuthor);
-        actionListBox.addItem("List Authors", () -> {});
+        actionListBox.addItem("List Authors", mainWindow::displayListAuthors);
         actionListBox.addItem("Update Author", () -> {});
         actionListBox.addItem("Delete Author", () -> {});
         actionListBox.addItem("Exit", () -> System.exit(0));
