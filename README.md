@@ -1,6 +1,7 @@
 # Library Management System
 
-A small project I'm writing in my spare time to demonstrate some coding design patterns I've learnt over the years. This
+A small project I'm writing in my spare time to demonstrate some coding design patterns I've learned over the years.
+This
 application is a simple library management system that (eventually) can be used to keep a record of all the books in a
 library, the current stock and which books have been borrowed.
 
@@ -15,14 +16,14 @@ precious commodity. If the developers are too busy debugging code and re-reading
 somewhat cryptic unreadable code, then time is being lost for the more appealing feature work.
 
 During my 10+ years as a software engineer I have increasingly found myself putting more value in making code easy to
-debug, and harder to introduce bugs. When I first learnt programming, I did what everyone does the first time they learn
-something new: practice using it all the time. I wrote lots of code, created parent/child classes and overloaded methods
-everywhere. It wasn't long before I came crashing back down and learnt the hard way how reading old code is not easy,
-that comments always fall behind, missing logs makes debugging much harder, why composition is better than inheritance
-and why it's easy to miss unit test cases when your classes being tested are way too big. I have also seen myself over
-the years write smaller and smaller methods, reaching to the point where I now have an aversion to nested indentations
-in a method. The more my method looks like a flat list of instructions (do this first, then do that, then do this...)
-the easier it is for me to know, at a high level, what my method is doing and why.
+debug, and harder to introduce bugs. When I first learned programming, I did what everyone does the first time they
+learn something new: practice using it all the time. I wrote lots of code, created parent/child classes and overloaded
+methods everywhere. It wasn't long before I came crashing back down and learned the hard way how reading old code is not
+easy, that comments always fall behind, missing logs makes debugging much harder, why composition is better than
+inheritance and why it's easy to miss unit test cases when your classes being tested are way too big. I have also seen
+myself over the years write smaller and smaller methods, reaching to the point where I now have an aversion to nested
+indentations in a method. The more my method looks like a flat list of instructions, the easier it is for me to know, at
+a high level, what my method is doing and why.
 
 That is the context behind my philosophy of coding. My aim is not to write the most optimal piece of assembly code
 ever, but to make coding and even debugging more fun and easy for me and my future team members. If you see yourself
@@ -104,17 +105,6 @@ Single Responsibility principle:
 - POJOs must have `equals()` and `hashCode()` methods defined so that they are always comparable and hashable
 - POJOs must have a `toString()` method defined so they can always be logged and debugging is easier
 
-This "only immutable objects" rule is a concept that comes from functional programming. In that paradigm, you always
-write functions with a clear input (e.g. an object) and a predictable output (e.g. another object). The key word here is
-_predictable_. This is the reason why we can trust our unit tests. If we can say with confidence that "every single time
-object A is given, we will always produce object B as output" then it is easier to reason about our code and tests.
-
-If you allow object’s values to change, then unit tests can never take care of every use case since an object can be
-modified after every possible step within a function being tested. A function may pass the modified object to other
-functions, and you might not have tested the use case for that particular modified object. This becomes much harder to
-test in a multi-threaded application. This was something I learned the hard way. Using immutable objects really does
-make code easier to reason about and test.
-
 So what should you do if an object needs to be modified? Create a new one with the new values. However, you should also
 be avoiding the `new` operator in your code (and using dependency injection to get the objects you need). So to avoid
 using the `new` operator, create converter objects (given an object, and the values to change, produce a new object with
@@ -131,6 +121,32 @@ from creating incomplete POJOs.
 
 ### Why immutable objects and no setters?
 
+The idea of only using immutable objects comes from Functional Programming. In that paradigm, functions are not allowed
+to modify any object given to them. This is another way of saying they have no side effects. If their output produces an
+object, it is either the one given to them, or an entirely new object. This allows the functions to be _predictable_.
+If you call the function with the same input one hundred times, you'll get the same output one hundred times. This
+cannot be guaranteed if you allow functions to have side effects, because you're allowing your object to be changed by
+someone else without realising it, and the assumptions you make as you write your code could be wrong.
+
+I have personally been burned by this, and learned the hard way how mutable objects makes debugging harder. I once had
+to debug my code, wondering why a computation was producing the wrong results. When I was reading my top-level code,
+there was no method call that modified the object, and yet somehow it was performing the final computation with wrong
+values. I finally found the bug nested within a second-level method call which was resetting an object's attribute back
+to zero.
+
+My top-level code assumed it was operating on the same object the entire time, and it's a lot easier to code when you
+make this assumption. If you know an object can never change, then it's easier to reason about your code. It's easier
+to trust the algorithm you've implemented will work with the same input data every time.
+
+If you allow an object’s values to change, then unit tests can never take care of every use case since an object can be
+modified during any step within a function being tested. A function may pass the modified object to other functions, and
+you might not have tested the use case for that particular modified object. This becomes much harder to test in a
+multi-threaded application. If objects never change, and you only use Factory objects to create new objects, then unit
+tests will become more reliable. Your unit tests will always know when a new object is created (by checking if the
+Factory object was ever used), and they will always test with the same data (which cannot be modified mid-test). This is
+why we can trust our unit tests. Our unit tests are saying "everytime we have these objects, and we call this method,
+we _always_ get the same output, and our original objects are still the same".
+
 ## Nulls and Optional values
 
 ## Value objects
@@ -141,9 +157,9 @@ from creating incomplete POJOs.
 
 ## Writing logs
 
-This one is not quite a design standard, but something I had a long time to think about over the years of debugging.
+This one is not quite a design standard, but something I had a long time to think throughout my years of debugging.
 Some people will write logs using the smallest characters possible, like `x=123`. Others will write logs that use more
-natural language. Which makes sense. People read logs when debugging. So it should be easy to read.
+natural language. Which is understandable. People read logs when debugging. So it should be easy to read.
 
 Firstly, logs have to be very descriptive. We read logs before diving into our code. Our logs must tell us what happened
 and it should be easy to know this just from reading the log entry. Don't use shortened words or abbreviations. It's no
