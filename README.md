@@ -177,9 +177,58 @@ rules I recommend following:
   the main benefit of using Optionals. You won't have surprise NPEs crashing your application because you have code that
   already handles the missing value use case.
 
-## Value objects
-
 ## Constructors and Getters examples
+
+There are occasions where a POJO will store nulls and is still a valid object. In this case the getters should return
+an Optional object. Force the caller to think about what they should do if the value does not exist. Also, it's fine
+for the POJO to have if-not-null checks. They are responsible for their own attributes, and they know that their
+attributes can be nulls. But when people write code elsewhere that uses POJOs, they won't remember which attributes can
+be null. So we need to remind them, by giving an Optional object. This will let them know they must be wary of the use
+case where the value is missing.
+
+```java
+import java.util.Optional;
+
+public class Person {
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public Optional<String> getMiddleName() {
+        return Optional.ofNullable(middleName);
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+}
+```
+
+If you allowed the `getMiddleName` method to return a null, then someone calling this method might not realise there
+are times where this value is missing:
+
+```java
+// Here, the method may return nulls
+// public String getMiddleName() { return middleName; }
+person.getMiddleName().toUpperCase();
+```
+
+The above will throw an NPE whenever the middle name is null. But if the method did return an optional, you're
+telling the caller "hey this could be missing a value" and they will have to consider what to do if it was missing:
+
+```text
+// Use a default value
+String value = person.getMiddleName().orElse("defaultValue");
+
+// Or only run code if there is a value
+person.getMiddleName().ifPresent(this::processMiddleName);
+```
+
+## Passing nulls into Constructors
+
+## Using Java Optionals
+
+## Value objects
 
 ## Inheritance vs Composition
 
