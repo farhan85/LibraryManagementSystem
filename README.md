@@ -147,7 +147,35 @@ Factory object was ever used), and they will always test with the same data (whi
 why we can trust our unit tests. Our unit tests are saying "everytime we have these objects, and we call this method,
 we _always_ get the same output, and our original objects are still the same".
 
-## Nulls and Optional values
+## Null objects
+
+This is one of those contentious issues where people are highly opinionated and cannot agree with the opposing view.
+After years of coding, I have finally chosen my side. _I. Hate. Nulls._ With a passion. I have spent way too much time
+debugging NullPointerException (NPE) issues throughout my career. I now firmly believe if we spend the extra effort to
+not allow nulls in the system, debugging issues will be much easier.
+
+Of course, there will be many cases where a value is not known. All languages have different ways of handling this
+situation. In Java, the fallback method is to pass null. From my experience, NPEs are the cause of many errors, and
+littering the code base with if-not-null checks is harder to maintain. People will eventually start forgetting these
+checks if they have to be put everywhere. But, you do need null-checks in some places. After all, we need to construct
+our data objects at some point, and we may not have been given all the data during input. To handle this, there are few
+rules I recommend following:
+
+- Data can only be passed into constructors or builder classes. No setters are allowed.
+- Data from the outside world is always passed into POJOs (via their constructor or Builder object). This is the only
+  place where we have null-checks and other validation tests. Every other class/method works with data from a POJO
+  which is guaranteed to contain valid data
+- Do not pass raw data around, only pass POJOs around. POJOs are guaranteed to always have data (their constructors will
+  throw exceptions if the POJOs were not constructed correctly)
+- Every constructor should check for nulls. I like to use Guava'a `checkNotNull()` in my constructors.
+- _Never pass nulls into any other method_. This is my second most important rule. Do not succumb to this rule. Be
+  relentless in enforcing this. If a method says it wants something, you must give it a valid object. Constructors will
+  check for nulls, no other method should. This is the cause of the majority of NPEs in every project. NPEs are thrown
+  when someone tries to use an object they did not realise was a null the whole time.
+- In Java, if a POJO contains a null value in an attribute, then it's getter method must return an `Optional` object.
+  This informs the caller that they may or may not have a value, and forces them to deal with both use cases. This is
+  the main benefit of using Optionals. You won't have surprise NPEs crashing your application because you have code that
+  already handles the missing value use case.
 
 ## Value objects
 
