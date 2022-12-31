@@ -6,7 +6,9 @@ import org.example.library.dao.ResourceDao;
 import org.example.library.models.Author;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -15,6 +17,7 @@ public class AuthorTable extends Table<String> {
 
     private final ResourceDao<Author> authorDao;
     private final TableModel<String> tableModel;
+    private final Map<Integer, UUID> rowAuthorId;
 
     public AuthorTable(final ResourceDao<Author> authorDao) {
         super("Id", "First Name", "Last Name");
@@ -22,16 +25,20 @@ public class AuthorTable extends Table<String> {
         setVisibleRows(10);
         setVisibleColumns(3);
         tableModel = getTableModel();
+        rowAuthorId = new HashMap<>();
     }
 
     public void refresh() {
         tableModel.clear();
-        authorDao.scan(author -> tableModel.addRow(authorToList(author)));
+        rowAuthorId.clear();
+        authorDao.scan(author -> {
+            tableModel.addRow(authorToList(author));
+            rowAuthorId.put(tableModel.getRowCount() - 1, author.getId());
+        });
     }
 
     public UUID getSelectedAuthor() {
-        final String authorId = tableModel.getCell(0, getSelectedRow());
-        return UUID.fromString(authorId);
+        return rowAuthorId.get(getSelectedRow());
     }
 
     public int size() {
@@ -40,7 +47,7 @@ public class AuthorTable extends Table<String> {
 
     private Collection<String> authorToList(final Author author) {
         return List.of(
-                author.getId().toString(),
+                author.getId().toString().substring(0, 6) + "...",
                 author.getFirstName(),
                 author.getLastName());
     }
