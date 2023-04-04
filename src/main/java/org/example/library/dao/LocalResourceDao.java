@@ -1,5 +1,6 @@
 package org.example.library.dao;
 
+import com.google.common.base.Preconditions;
 import org.example.library.models.Resource;
 
 import java.util.HashMap;
@@ -7,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * An in-memory ResourceDao implementation.
@@ -23,11 +26,9 @@ public class LocalResourceDao<R extends Resource> implements ResourceDao<R> {
 
     @Override
     public void create(final R resource) {
-        if (!resources.containsKey(resource.getId())) {
-            resources.put(resource.getId(), resource);
-        } else {
-            throw new RuntimeException(String.format("Resource already exists. ID=%s", resource.getId()));
-        }
+        UUID resourceId = resource.getId();
+        checkState(!resources.containsKey(resourceId), String.format("Resource already exists. ID=%s", resourceId));
+        resources.put(resourceId, resource);
     }
 
     @Override
@@ -47,6 +48,8 @@ public class LocalResourceDao<R extends Resource> implements ResourceDao<R> {
 
     @Override
     public void update(final R resource) {
-        resources.put(resource.getId(), resource);
+        UUID resourceId = resource.getId();
+        checkState(resources.containsKey(resourceId), String.format("Resource does not exist. ID=%s", resourceId));
+        resources.put(resourceId, resource);
     }
 }

@@ -60,11 +60,17 @@ public class LocalResourceDaoTest {
     }
 
     @Test
-    public void GIVEN_resource_WHEN_calling_update_THEN_call_resourceUpdater_update() {
+    public void GIVEN_resource_WHEN_calling_update_with_new_dataVersion_THEN_save_resource_with_new_dataVersion() {
         final TestResource resource1 = TestResource.random();
         final TestResource resource2 = TestResource.of(resource1.getId(), resource1.getDataVersion() + 1);
-        resourceDao.update(resource1);
+        resourceDao.create(resource1);
         resourceDao.update(resource2);
         assertEquals(resourceDao.get(resource1.getId()), Optional.of(resource2));
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void GIVEN_resource_not_exists_WHEN_calling_update_THEN_throw_IllegalStateException() {
+        final TestResource resource1 = TestResource.random();
+        resourceDao.update(resource1);
     }
 }
