@@ -33,17 +33,6 @@ public class UpdateAuthor extends Panel {
         lastNameTextBox = new TextBox().setValidationPattern(Pattern.compile("[a-zA-Z ]*"));
         authorIdLabel = new Label("");
 
-        Button updateBtn = new Button("Update", this::updateAuthor);
-        Button backAuthorSelectionBtn = new Button("Back (author selection)", mainWindow::displayUpdateAuthorSelector);
-        Button backMainMenuBtn = new Button("Back (main menu)", mainWindow::displayMainMenu);
-
-        updateBtn.setLayoutData(
-                GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING, true, false, 2, 1));
-        backAuthorSelectionBtn.setLayoutData(
-                GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING, true, false, 2, 1));
-        backMainMenuBtn.setLayoutData(
-                GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.BEGINNING, true, false, 2, 1));
-
         setLayoutManager(new GridLayout(2));
         addComponent(new Label("ID"));
         addComponent(authorIdLabel);
@@ -54,13 +43,12 @@ public class UpdateAuthor extends Panel {
         addComponent(new EmptySpace());
         addComponent(new EmptySpace());
 
-
         addComponent(new EmptySpace());
-        addComponent(updateBtn);
+        addComponent(new Button("Update", this::updateAuthor));
         addComponent(new EmptySpace());
-        addComponent(backAuthorSelectionBtn);
+        addComponent(new Button("Back (author selection)", mainWindow::displayUpdateAuthorSelector));
         addComponent(new EmptySpace());
-        addComponent(backMainMenuBtn);
+        addComponent(new Button("Back (main menu)", mainWindow::displayMainMenu));
     }
 
     public void displayAuthor(final UUID authorId) {
