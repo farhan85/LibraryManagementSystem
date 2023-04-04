@@ -8,9 +8,12 @@ import org.example.library.gui.panels.CreateAuthor;
 import org.example.library.gui.panels.DeleteAuthor;
 import org.example.library.gui.panels.ListAuthors;
 import org.example.library.gui.panels.MainMenu;
+import org.example.library.gui.panels.UpdateAuthor;
+import org.example.library.gui.panels.UpdateAuthorSelector;
 import org.example.library.models.Author;
 
 import java.util.List;
+import java.util.UUID;
 
 public class MainWindow extends BasicWindow {
 
@@ -18,6 +21,8 @@ public class MainWindow extends BasicWindow {
     private final CreateAuthor createAuthor;
     private final ListAuthors listAuthors;
     private final DeleteAuthor deleteAuthor;
+    private final UpdateAuthorSelector updateAuthorSelector;
+    private final UpdateAuthor updateAuthor;
 
     public MainWindow(final ResourceDao<Author> authorDao) {
         super("Library Management System");
@@ -28,6 +33,8 @@ public class MainWindow extends BasicWindow {
         this.createAuthor = new CreateAuthor(this, authorDao);
         this.listAuthors = new ListAuthors(this, authorDao);
         this.deleteAuthor = new DeleteAuthor(this, authorDao);
+        this.updateAuthorSelector = new UpdateAuthorSelector(this, authorDao);
+        this.updateAuthor = new UpdateAuthor(this, authorDao);
     }
 
     public void displayMainMenu() {
@@ -41,6 +48,16 @@ public class MainWindow extends BasicWindow {
     public void displayListAuthors() {
         setComponent(listAuthors);
         listAuthors.refresh();
+    }
+
+    public void displayUpdateAuthorSelector() {
+        setComponent(updateAuthorSelector);
+        updateAuthorSelector.refresh();
+    }
+
+    public void displayUpdateAuthor(final UUID authorId) {
+        setComponent(updateAuthor);
+        updateAuthor.displayAuthor(authorId);
     }
 
     public void displayDeleteAuthor() {
