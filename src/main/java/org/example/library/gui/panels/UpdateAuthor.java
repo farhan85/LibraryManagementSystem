@@ -12,6 +12,7 @@ import org.example.library.gui.MainWindow;
 import org.example.library.models.Author;
 import org.example.library.models.ImmutableAuthor;
 
+import java.util.ConcurrentModificationException;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -59,17 +60,33 @@ public class UpdateAuthor extends Panel {
     }
 
     private void updateAuthor() {
-        final String authorId = authorIdLabel.getText();
+        final UUID authorId = UUID.fromString(authorIdLabel.getText());
+        authorDao.get(authorId)
+                .map(this::toUpdatedAuthor)
+                .map(this::saveChanges)
+                .orElseGet(() -> {
+                    MessageDialog.showMessageDialog(mainWindow.getTextGUI(), "Error", "Author not found");
+                    return null;
+                });
+    }
+
+    private Author toUpdatedAuthor(final Author originalAuthor) {
         final String firstName = firstNameTextBox.getText();
         final String lastName = lastNameTextBox.getText();
-
-        final Author author = ImmutableAuthor.builder()
-                .withId(UUID.fromString(authorId))
+        return ImmutableAuthor.builder()
+                .from(originalAuthor)
                 .withFirstName(firstName)
                 .withLastName(lastName)
                 .build();
-        authorDao.update(author);
+    }
 
-        MessageDialog.showMessageDialog(mainWindow.getTextGUI(), "", "Updated Author");
+    private Author saveChanges(final Author author) {
+        try {
+            authorDao.update(author);
+            MessageDialog.showMessageDialog(mainWindow.getTextGUI(), "Success", "Updated Author");
+        } catch (final ConcurrentModificationException e) {
+            MessageDialog.showMessageDialog(mainWindow.getTextGUI(), "Error", "Author was updated by another process.\nTry again");
+        }
+        return author;
     }
 }
