@@ -25,7 +25,7 @@ public class LocalResourceDao<R extends Resource> implements ResourceDao<R> {
 
     @Override
     public void create(final R resource) {
-        UUID resourceId = resource.getId();
+        final UUID resourceId = resource.getId();
         checkState(!resources.containsKey(resourceId), String.format("Resource already exists. ID=%s", resourceId));
         resources.put(resourceId, resource);
     }
@@ -47,7 +47,7 @@ public class LocalResourceDao<R extends Resource> implements ResourceDao<R> {
 
     @Override
     public void update(final R resource) {
-        UUID resourceId = resource.getId();
+        final UUID resourceId = resource.getId();
         checkState(resources.containsKey(resourceId), String.format("Resource does not exist. ID=%s", resourceId));
         resources.put(resourceId, resource);
     }

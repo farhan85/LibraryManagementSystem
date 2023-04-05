@@ -1,8 +1,6 @@
 package org.example.library.guice;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
@@ -15,9 +13,6 @@ import com.google.inject.name.Names;
 import dev.failsafe.RateLimiter;
 
 import java.time.Duration;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

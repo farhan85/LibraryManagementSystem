@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Runs the Library Management System application.
@@ -71,7 +70,7 @@ public class MainApp {
     }
 
     public static void main(final String[] args) throws IOException {
-        MainApp mainApp = new MainApp();
+        final MainApp mainApp = new MainApp();
         JCommander.newBuilder()
                 .addObject(mainApp)
                 .build()
