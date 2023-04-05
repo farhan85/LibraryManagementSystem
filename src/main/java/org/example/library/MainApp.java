@@ -25,23 +25,22 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class MainApp {
 
-    @Parameter(names = { "-memdb" }, description = "Use in-memory DB")
+    @Parameter(names = {"-memdb"}, description = "Use in-memory DB")
     private boolean useInMemoryDb = false;
 
-    @Parameter(names = { "-ddb" }, description = "Use AWS DDB")
+    @Parameter(names = {"-ddb"}, description = "Use AWS DDB")
     private boolean useAwsDdb = false;
 
-    @Parameter(names = { "-region" }, description = "AWS Region name")
+    @Parameter(names = {"-region"}, description = "AWS Region name")
     private String region;
 
-    @Parameter(names = { "-profile" }, description = "Profile name of AWS credentials to use")
+    @Parameter(names = {"-profile"}, description = "Profile name of AWS credentials to use")
     private String profile;
 
     private Regions getRegion() {
-        return Stream.of(
-                region,
-                System.getenv("AWS_REGION"),
-                System.getenv("AWS_DEFAULT_REGION"))
+        return Stream.of(region,
+                        System.getenv("AWS_REGION"),
+                        System.getenv("AWS_DEFAULT_REGION"))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .map(Regions::fromName)
