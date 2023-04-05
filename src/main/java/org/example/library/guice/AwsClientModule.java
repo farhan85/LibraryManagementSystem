@@ -1,6 +1,7 @@
 package org.example.library.guice;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -9,33 +10,25 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import dev.failsafe.RateLimiter;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AwsClientModule extends AbstractModule {
+
     private final Regions region;
+    private final AWSCredentialsProvider credentialsProvider;
 
-    public AwsClientModule(final Regions region) {
+    public AwsClientModule(final Regions region, final AWSCredentialsProvider credentialsProvider) {
         this.region = checkNotNull(region);
-    }
-
-    public AwsClientModule() {
-        this.region = Stream.of(
-                        System.getProperty("region"),
-                        System.getenv("AWS_REGION"),
-                        System.getenv("AWS_DEFAULT_REGION"))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .map(Regions::fromName)
-                .orElseThrow(() -> new RuntimeException("No AWS region specified"));
+        this.credentialsProvider = checkNotNull(credentialsProvider);
     }
 
     @Override
@@ -44,15 +37,9 @@ public class AwsClientModule extends AbstractModule {
     }
 
     @Provides
-    @Singleton
-    public AWSCredentialsProvider getCredentials() {
-        return new ProfileCredentialsProvider("iam_user_admin");
-    }
-
-    @Provides
-    public AmazonDynamoDB provideAmazonDynamoDB(final AWSCredentialsProvider credentials) {
+    public AmazonDynamoDB provideAmazonDynamoDB() {
         return AmazonDynamoDBClient.builder()
-                .withCredentials(credentials)
+                .withCredentials(credentialsProvider)
                 .withRegion(region)
                 .build();
     }
