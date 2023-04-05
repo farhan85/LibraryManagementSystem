@@ -1,22 +1,18 @@
 package org.example.library;
 
+import com.amazonaws.regions.Regions;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.gui2.DefaultWindowManager;
-import com.googlecode.lanterna.gui2.EmptySpace;
-import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-import org.example.library.dao.ResourceDao;
-import org.example.library.gui.MainWindow;
+import org.example.library.gui.MainScreen;
+import org.example.library.guice.AwsClientModule;
+import org.example.library.guice.DDBDaoModule;
 import org.example.library.guice.LocalDaoModule;
-import org.example.library.models.Author;
 
 import java.io.IOException;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -24,27 +20,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class MainApp {
 
-    private final Screen screen;
-    private final WindowBasedTextGUI textGUI;
-    private final MainWindow mainWindow;
+    @Parameter(names = { "-memdb" }, description = "Use in-memory DB")
+    private boolean useInMemoryDb = false;
 
-    @Inject
-    private MainApp(final ResourceDao<Author> authorDao) throws IOException {
-        checkNotNull(authorDao);
+    @Parameter(names = { "-ddb" }, description = "Use AWS DDB")
+    private boolean useAwsDdb = false;
 
-        screen = new DefaultTerminalFactory().createScreen();
-        textGUI = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.BLUE));
-        mainWindow = new MainWindow(authorDao);
-    }
+    @Parameter(names = { "-r", "-region" }, description = "AWS Region name")
+    private String region;
 
-    public void run() throws IOException {
-        mainWindow.displayMainMenu();
-        screen.startScreen();
-        textGUI.addWindowAndWait(mainWindow);
+    private void run() throws IOException {
+        final Injector injector;
+        checkArgument(useInMemoryDb || useAwsDdb, "Must specify which DDB type to use");
+
+        if (useInMemoryDb) {
+            injector = Guice.createInjector(new LocalDaoModule());
+        } else {
+            checkNotNull(region);
+            injector = Guice.createInjector(
+                    new AwsClientModule(Regions.fromName(region)),
+                    new DDBDaoModule());
+        }
+        injector.getInstance(MainScreen.class).run();
     }
 
     public static void main(final String[] args) throws IOException {
-        final Injector injector = Guice.createInjector(new LocalDaoModule());
-        injector.getInstance(MainApp.class).run();
+        MainApp mainApp = new MainApp();
+        JCommander.newBuilder()
+                .addObject(mainApp)
+                .build()
+                .parse(args);
+        mainApp.run();
     }
 }
