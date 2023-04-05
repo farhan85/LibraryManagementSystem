@@ -8,6 +8,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.mockito.Mockito.verify;
@@ -57,6 +58,18 @@ public class LocalResourceDaoTest {
         resourceDao.scan(mockConsumer);
         verify(mockConsumer).accept(resource1);
         verify(mockConsumer).accept(resource2);
+    }
+
+    @Test
+    public void GIVEN_resource_uuid_WHEN_calling_get_THEN_return_resource() {
+        final TestResource expected = TestResource.random();
+        resourceDao.create(expected);
+        assertEquals(resourceDao.get(expected.getId()), Optional.of(expected));
+    }
+
+    @Test
+    public void GIVEN_resource_not_exists_WHEN_calling_get_THEN_return_empty_optional() {
+        assertEquals(resourceDao.get(UUID.randomUUID()), Optional.empty());
     }
 
     @Test

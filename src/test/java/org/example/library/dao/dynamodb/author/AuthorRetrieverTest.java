@@ -20,6 +20,7 @@ import static org.testng.Assert.assertEquals;
 public class AuthorRetrieverTest {
 
     private static final Author AUTHOR = AuthorFactory.random();
+    private static final UUID INVALID_UUID = UUID.randomUUID();
     private static final UUID TEST_UUID = AUTHOR.getId();
     private static final Item AUTHOR_ITEM = new Item()
             .withString(AuthorAttributes.ID.toString(), TEST_UUID.toString())
@@ -29,19 +30,24 @@ public class AuthorRetrieverTest {
 
     @Mock
     private Table mockAuthorsTable;
-
     private AuthorRetriever authorRetriever;
 
     @BeforeMethod
     public void setup() {
-        when(mockAuthorsTable.getItem(AuthorAttributes.ID.toString(), TEST_UUID.toString()))
-                .thenReturn(AUTHOR_ITEM);
         authorRetriever = new AuthorRetriever(mockAuthorsTable);
     }
 
     @Test
     public void GIVEN_uuid_WHEN_calling_get_THEN_return_Author() {
-        final Optional<Author> author = authorRetriever.get(TEST_UUID);
-        assertEquals(author, Optional.of(AUTHOR));
+        when(mockAuthorsTable.getItem(AuthorAttributes.ID.toString(), TEST_UUID.toString()))
+                .thenReturn(AUTHOR_ITEM);
+        assertEquals(authorRetriever.get(TEST_UUID), Optional.of(AUTHOR));
+    }
+
+    @Test
+    public void GIVEN_uuid_and_item_does_not_exist_WHEN_calling_get_THEN_return_empty_optional() {
+        when(mockAuthorsTable.getItem(AuthorAttributes.ID.toString(), INVALID_UUID.toString()))
+                .thenReturn(null);
+        assertEquals(authorRetriever.get(INVALID_UUID), Optional.empty());
     }
 }
