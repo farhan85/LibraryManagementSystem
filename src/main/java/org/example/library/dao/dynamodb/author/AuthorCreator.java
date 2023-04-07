@@ -1,6 +1,5 @@
 package org.example.library.dao.dynamodb.author;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.PutItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
@@ -14,6 +13,7 @@ import java.util.ConcurrentModificationException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.example.library.dao.dynamodb.author.converter.AuthorToItemConverter.toItem;
 
 public class AuthorCreator implements ResourceCreator<Author> {
 
@@ -26,6 +26,7 @@ public class AuthorCreator implements ResourceCreator<Author> {
 
     @Override
     public void create(final Author author) {
+        checkArgument(author.getDataVersion() == 1);
         try {
             authorsTable.putItem(new PutItemSpec()
                     .withItem(toItem(author))
@@ -33,16 +34,7 @@ public class AuthorCreator implements ResourceCreator<Author> {
                     .withNameMap(new NameMap().with("#id", AuthorAttributes.ID.toString()))
             );
         } catch (final ConditionalCheckFailedException e) {
-            throw new ConcurrentModificationException(String.format("Author already exists. ID=%s", author.getId()), e);
+            throw new ConcurrentModificationException(String.format("Author already exists. AuthorId=%s", author.getId()), e);
         }
-    }
-
-    private Item toItem(final Author author) {
-        checkArgument(author.getDataVersion() == 1);
-        return new Item()
-                .withPrimaryKey(AuthorAttributes.ID.toString(), author.getId().toString())
-                .withString(AuthorAttributes.FIRST_NAME.toString(), author.getFirstName())
-                .withString(AuthorAttributes.LAST_NAME.toString(), author.getLastName())
-                .withNumber(AuthorAttributes.DATA_VERSION.toString(), author.getDataVersion());
     }
 }

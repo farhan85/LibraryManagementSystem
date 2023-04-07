@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public class AuthorFactory {
+public final class AuthorFactory {
 
     private static final Random RANDOM = new Random();
 

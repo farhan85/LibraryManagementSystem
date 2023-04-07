@@ -28,7 +28,7 @@ public class AuthorUpdater implements ResourceUpdater<Author> {
         try {
             updateDDBItem(author);
         } catch (final ConditionalCheckFailedException e) {
-            final String message = String.format("Author item modified by another process. ID=%s dataVersion=%d",
+            final String message = String.format("Author item modified by another process. AuthorId=%s dataVersion=%d",
                     author.getId(),
                     author.getDataVersion());
             throw new ConcurrentModificationException(message, e);

@@ -20,7 +20,7 @@ public class AuthorToItemConverter {
 
     public static Item toItem(final Author author) {
         return new Item()
-                .withString(AuthorAttributes.ID.toString(), author.getId().toString())
+                .withPrimaryKey(AuthorAttributes.ID.toString(), author.getId().toString())
                 .withString(AuthorAttributes.FIRST_NAME.toString(), author.getFirstName())
                 .withString(AuthorAttributes.LAST_NAME.toString(), author.getLastName())
                 .withNumber(AuthorAttributes.DATA_VERSION.toString(), author.getDataVersion());
