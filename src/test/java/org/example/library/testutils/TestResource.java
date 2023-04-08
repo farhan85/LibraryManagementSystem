@@ -3,33 +3,30 @@ package org.example.library.testutils;
 import org.example.library.models.Resource;
 
 import java.util.Random;
-import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class TestResource implements Resource {
+public final class TestResource implements Resource<TestResourceId> {
 
     private static final Random RANDOM = new Random();
 
-    private final UUID uuid;
+    private final TestResourceId resourceId;
     private final int dataVersion;
 
-    private TestResource(final UUID uuid, final int dataVersion) {
-        this.uuid = checkNotNull(uuid);
+    private TestResource(final TestResourceId resourceId, final int dataVersion) {
+        this.resourceId = resourceId;
         this.dataVersion = dataVersion;
     }
 
-    public static TestResource of(final UUID uuid, final int dataVersion) {
-        return new TestResource(uuid, dataVersion);
+    public static TestResource of(final TestResourceId resourceId, final int dataVersion) {
+        return new TestResource(resourceId, dataVersion);
     }
 
     public static TestResource random() {
-        return new TestResource(UUID.randomUUID(), RANDOM.nextInt());
+        return new TestResource(TestResourceId.random(), RANDOM.nextInt());
     }
 
     @Override
-    public UUID getId() {
-        return uuid;
+    public TestResourceId getId() {
+        return resourceId;
     }
 
     @Override

@@ -4,22 +4,22 @@ import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableModel;
 import org.example.library.dao.ResourceDao;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AuthorTable extends Table<String> {
 
-    private final ResourceDao<Author> authorDao;
+    private final ResourceDao<AuthorId, Author> authorDao;
     private final TableModel<String> tableModel;
-    private final Map<Integer, UUID> rowAuthorId;
+    private final Map<Integer, AuthorId> rowAuthorId;
 
-    public AuthorTable(final ResourceDao<Author> authorDao) {
+    public AuthorTable(final ResourceDao<AuthorId, Author> authorDao) {
         super("Id", "First Name", "Last Name");
         this.authorDao = checkNotNull(authorDao);
         setVisibleRows(10);
@@ -37,7 +37,7 @@ public class AuthorTable extends Table<String> {
         });
     }
 
-    public UUID getSelectedAuthor() {
+    public AuthorId getSelectedAuthor() {
         return rowAuthorId.get(getSelectedRow());
     }
 
@@ -47,7 +47,7 @@ public class AuthorTable extends Table<String> {
 
     private Collection<String> authorToList(final Author author) {
         return List.of(
-                author.getId().toString().substring(0, 6) + "...",
+                author.getId().value().substring(0, 6) + "...",
                 author.getFirstName(),
                 author.getLastName());
     }

@@ -4,10 +4,10 @@ import com.google.common.cache.Cache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import org.example.library.models.Resource;
+import org.example.library.models.ResourceId;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -16,15 +16,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A ResourceDao implementation with an in-memory cache.
  *
+ * @param <I> The ResourceId type that identifies a resource.
  * @param <R> The type of Resource object to manage.
  */
-public class CachedResourceDao<R extends Resource> implements ResourceDao<R> {
+public class CachedResourceDao<I extends ResourceId, R extends Resource<I>> implements ResourceDao<I, R> {
 
-    private final Cache<UUID, R> cache;
-    private final ResourceDao<R> resourceDao;
+    private final Cache<I, R> cache;
+    private final ResourceDao<I, R> resourceDao;
 
     @Inject
-    public CachedResourceDao(final ResourceDao<R> resourceDao, final Cache<UUID, R> cache) {
+    public CachedResourceDao(final ResourceDao<I, R> resourceDao, final Cache<I, R> cache) {
         this.resourceDao = checkNotNull(resourceDao);
         this.cache = checkNotNull(cache);
     }
@@ -35,15 +36,15 @@ public class CachedResourceDao<R extends Resource> implements ResourceDao<R> {
     }
 
     @Override
-    public void delete(final UUID uuid) {
-        cache.invalidate(uuid);
-        resourceDao.delete(uuid);
+    public void delete(final I resourceId) {
+        cache.invalidate(resourceId);
+        resourceDao.delete(resourceId);
     }
 
     @Override
-    public Optional<R> get(final UUID uuid) {
+    public Optional<R> get(final I resourceId) {
         try {
-            final R resource = cache.get(uuid, () -> resourceDao.get(uuid).orElseThrow());
+            final R resource = cache.get(resourceId, () -> resourceDao.get(resourceId).orElseThrow());
             return Optional.of(resource);
         } catch (final ExecutionException | UncheckedExecutionException e) {
             return Optional.empty();

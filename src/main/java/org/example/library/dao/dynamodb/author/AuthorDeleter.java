@@ -4,13 +4,11 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.example.library.dao.ResourceDeleter;
-import org.example.library.models.Author;
-
-import java.util.UUID;
+import org.example.library.models.AuthorId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class AuthorDeleter implements ResourceDeleter<Author> {
+public class AuthorDeleter implements ResourceDeleter<AuthorId> {
 
     private final Table authorsTable;
 
@@ -20,7 +18,7 @@ public class AuthorDeleter implements ResourceDeleter<Author> {
     }
 
     @Override
-    public void delete(final UUID uuid) {
-        authorsTable.deleteItem(AuthorAttributes.ID.toString(), uuid.toString());
+    public void delete(final AuthorId authorId) {
+        authorsTable.deleteItem(AuthorAttributes.ID.toString(), authorId.value());
     }
 }

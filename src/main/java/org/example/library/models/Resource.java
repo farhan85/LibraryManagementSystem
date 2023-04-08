@@ -1,16 +1,16 @@
 package org.example.library.models;
 
-import java.util.UUID;
-
 /**
  * Represents a resource stored in the database.
  *
  * Every resource needs its own unique ID (using a UUID) and a DataVersion that
  * is used for optimistic locking.
+ *
+ * @param <I> The ResourceId type that identifies resource of this type.
  */
-public interface Resource {
+public interface Resource<I extends ResourceId> {
 
-    UUID getId();
+    I getId();
 
     int getDataVersion();
 }

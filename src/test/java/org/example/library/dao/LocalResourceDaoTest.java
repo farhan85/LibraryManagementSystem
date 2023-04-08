@@ -1,6 +1,7 @@
 package org.example.library.dao;
 
 import org.example.library.testutils.TestResource;
+import org.example.library.testutils.TestResourceId;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeMethod;
@@ -8,7 +9,6 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.mockito.Mockito.verify;
@@ -20,7 +20,7 @@ public class LocalResourceDaoTest {
     @Mock
     private Consumer<TestResource> mockConsumer;
 
-    private LocalResourceDao<TestResource> resourceDao;
+    private LocalResourceDao<TestResourceId, TestResource> resourceDao;
 
     @BeforeMethod
     public void setup() {
@@ -69,7 +69,7 @@ public class LocalResourceDaoTest {
 
     @Test
     public void GIVEN_resource_not_exists_WHEN_calling_get_THEN_return_empty_optional() {
-        assertEquals(resourceDao.get(UUID.randomUUID()), Optional.empty());
+        assertEquals(resourceDao.get(TestResourceId.random()), Optional.empty());
     }
 
     @Test

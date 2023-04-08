@@ -34,7 +34,9 @@ public class AuthorCreator implements ResourceCreator<Author> {
                     .withNameMap(new NameMap().with("#id", AuthorAttributes.ID.toString()))
             );
         } catch (final ConditionalCheckFailedException e) {
-            throw new ConcurrentModificationException(String.format("Author already exists. AuthorId=%s", author.getId()), e);
+            throw new ConcurrentModificationException(
+                    String.format("Author already exists. AuthorId=%s", author.getId().value()),
+                    e);
         }
     }
 }

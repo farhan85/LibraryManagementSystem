@@ -1,6 +1,7 @@
 package org.example.library.dao;
 
 import org.example.library.testutils.TestResource;
+import org.example.library.testutils.TestResourceId;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeMethod;
@@ -20,21 +21,22 @@ public class ResourceDaoDelegatorTest {
     @Mock
     private ResourceCreator<TestResource> mockResourceCreator;
     @Mock
-    private ResourceDeleter<TestResource> mockResourceDeleter;
+    private ResourceDeleter<TestResourceId> mockResourceDeleter;
     @Mock
     private ResourceUpdater<TestResource> mockResourceUpdater;
     @Mock
-    private ResourceRetriever<TestResource> mockResourceRetriever;
+    private ResourceRetriever<TestResourceId, TestResource> mockResourceRetriever;
     @Mock
     private ResourceScanner<TestResource> mockResourceScanner;
     @Mock
     private Consumer<TestResource> mockConsumer;
 
-    private ResourceDaoDelegator<TestResource> resourceDao;
+    private ResourceDaoDelegator<TestResourceId, TestResource> resourceDao;
 
     @BeforeMethod
     public void setup() {
-        resourceDao = new ResourceDaoDelegator<>(mockResourceCreator, mockResourceDeleter, mockResourceUpdater, mockResourceRetriever, mockResourceScanner);
+        resourceDao = new ResourceDaoDelegator<>(mockResourceCreator, mockResourceDeleter, mockResourceUpdater,
+                mockResourceRetriever, mockResourceScanner);
     }
 
     @Test

@@ -2,9 +2,9 @@ package org.example.library.dao;
 
 import com.google.inject.Inject;
 import org.example.library.models.Resource;
+import org.example.library.models.ResourceId;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -12,21 +12,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Implements the ResourceDao interface by delegating the operations to the respective Dao objects.
  *
+ * @param <I> The ResourceId type that identifies a resource.
  * @param <R> The type of Resource object to manage.
  */
-public class ResourceDaoDelegator<R extends Resource> implements ResourceDao<R> {
+public class ResourceDaoDelegator<I extends ResourceId, R extends Resource<I>> implements ResourceDao<I, R> {
 
     private final ResourceCreator<R> resourceCreator;
-    private final ResourceDeleter<R> resourceDeleter;
+    private final ResourceDeleter<I> resourceDeleter;
     private final ResourceUpdater<R> resourceUpdater;
-    private final ResourceRetriever<R> resourceRetriever;
+    private final ResourceRetriever<I, R> resourceRetriever;
     private final ResourceScanner<R> resourceScanner;
 
     @Inject
     public ResourceDaoDelegator(final ResourceCreator<R> resourceCreator,
-                                final ResourceDeleter<R> resourceDeleter,
+                                final ResourceDeleter<I> resourceDeleter,
                                 final ResourceUpdater<R> resourceUpdater,
-                                final ResourceRetriever<R> resourceRetriever,
+                                final ResourceRetriever<I, R> resourceRetriever,
                                 final ResourceScanner<R> resourceScanner) {
         this.resourceCreator = checkNotNull(resourceCreator);
         this.resourceDeleter = checkNotNull(resourceDeleter);
@@ -41,13 +42,13 @@ public class ResourceDaoDelegator<R extends Resource> implements ResourceDao<R> 
     }
 
     @Override
-    public void delete(final UUID uuid) {
-        resourceDeleter.delete(uuid);
+    public void delete(final I resourceId) {
+        resourceDeleter.delete(resourceId);
     }
 
     @Override
-    public Optional<R> get(final UUID uuid) {
-        return resourceRetriever.get(uuid);
+    public Optional<R> get(final I resourceId) {
+        return resourceRetriever.get(resourceId);
     }
 
     @Override

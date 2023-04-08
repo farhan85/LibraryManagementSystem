@@ -11,9 +11,10 @@ import org.example.library.gui.panels.MainMenu;
 import org.example.library.gui.panels.UpdateAuthor;
 import org.example.library.gui.panels.UpdateAuthorSelector;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
+import org.example.library.models.ImmutableAuthorId;
 
 import java.util.List;
-import java.util.UUID;
 
 public class MainWindow extends BasicWindow {
 
@@ -24,7 +25,7 @@ public class MainWindow extends BasicWindow {
     private final UpdateAuthorSelector updateAuthorSelector;
     private final UpdateAuthor updateAuthor;
 
-    public MainWindow(final ResourceDao<Author> authorDao) {
+    public MainWindow(final ResourceDao<AuthorId, Author> authorDao) {
         super("Library Management System");
         setHints(List.of(Window.Hint.CENTERED));
         setFixedSize(new TerminalSize(60, 15));
@@ -55,7 +56,7 @@ public class MainWindow extends BasicWindow {
         updateAuthorSelector.refresh();
     }
 
-    public void displayUpdateAuthor(final UUID authorId) {
+    public void displayUpdateAuthor(final AuthorId authorId) {
         setComponent(updateAuthor);
         updateAuthor.displayAuthor(authorId);
     }

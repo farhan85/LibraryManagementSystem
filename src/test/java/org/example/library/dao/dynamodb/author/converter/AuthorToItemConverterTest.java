@@ -13,7 +13,7 @@ public class AuthorToItemConverterTest {
 
     private static final Author AUTHOR = AuthorFactory.random();
     private static final Item AUTHOR_ITEM = new Item()
-            .withString(AuthorAttributes.ID.toString(), AUTHOR.getId().toString())
+            .withString(AuthorAttributes.ID.toString(), AUTHOR.getId().value())
             .withString(AuthorAttributes.FIRST_NAME.toString(), AUTHOR.getFirstName())
             .withString(AuthorAttributes.LAST_NAME.toString(), AUTHOR.getLastName())
             .withNumber(AuthorAttributes.DATA_VERSION.toString(), AUTHOR.getDataVersion());

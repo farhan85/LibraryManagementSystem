@@ -8,18 +8,17 @@ import org.example.library.dao.ResourceDao;
 import org.example.library.gui.AuthorTable;
 import org.example.library.gui.MainWindow;
 import org.example.library.models.Author;
-
-import java.util.UUID;
+import org.example.library.models.AuthorId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DeleteAuthor extends Panel {
 
     private final MainWindow mainWindow;
-    private final ResourceDao<Author> authorDao;
+    private final ResourceDao<AuthorId, Author> authorDao;
     private final AuthorTable authorTable;
 
-    public DeleteAuthor(final MainWindow mainWindow, final ResourceDao<Author> authorDao) {
+    public DeleteAuthor(final MainWindow mainWindow, final ResourceDao<AuthorId, Author> authorDao) {
         this.mainWindow = checkNotNull(mainWindow);
         this.authorDao = checkNotNull(authorDao);
 
@@ -37,7 +36,7 @@ public class DeleteAuthor extends Panel {
 
     private void deleteAuthor() {
         int selectedRow = authorTable.getSelectedRow();
-        final UUID authorId = authorTable.getSelectedAuthor();
+        final AuthorId authorId = authorTable.getSelectedAuthor();
         authorDao.delete(authorId);
         authorTable.refresh();
 

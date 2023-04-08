@@ -10,7 +10,9 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import org.example.library.dao.ResourceDao;
 import org.example.library.gui.MainWindow;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 import org.example.library.models.ImmutableAuthor;
+import org.example.library.models.ImmutableAuthorId;
 
 import java.util.ConcurrentModificationException;
 import java.util.UUID;
@@ -21,12 +23,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class UpdateAuthor extends Panel {
 
     private final MainWindow mainWindow;
-    private final ResourceDao<Author> authorDao;
+    private final ResourceDao<AuthorId, Author> authorDao;
     private final Label authorIdLabel;
     private final TextBox firstNameTextBox;
     private final TextBox lastNameTextBox;
 
-    public UpdateAuthor(final MainWindow mainWindow, final ResourceDao<Author> authorDao) {
+    public UpdateAuthor(final MainWindow mainWindow, final ResourceDao<AuthorId, Author> authorDao) {
         this.mainWindow = checkNotNull(mainWindow);
         this.authorDao = checkNotNull(authorDao);
 
@@ -52,16 +54,16 @@ public class UpdateAuthor extends Panel {
         addComponent(new Button("Back (main menu)", mainWindow::displayMainMenu));
     }
 
-    public void displayAuthor(final UUID authorId) {
+    public void displayAuthor(final AuthorId authorId) {
         final Author author = authorDao.get(authorId).orElseThrow();
-        authorIdLabel.setText(author.getId().toString());
+        authorIdLabel.setText(author.getId().value());
         firstNameTextBox.setText(author.getFirstName());
         lastNameTextBox.setText(author.getLastName());
     }
 
     private void updateAuthor() {
-        final UUID authorId = UUID.fromString(authorIdLabel.getText());
-        authorDao.get(authorId)
+        final UUID authorUuid = UUID.fromString(authorIdLabel.getText());
+        authorDao.get(ImmutableAuthorId.of(authorUuid))
                 .map(this::toUpdatedAuthor)
                 .map(this::saveChanges)
                 .orElseGet(() -> {

@@ -2,6 +2,7 @@ package org.example.library.testutils;
 
 import org.example.library.models.Author;
 import org.example.library.models.ImmutableAuthor;
+import org.example.library.models.ImmutableAuthorId;
 
 import java.util.List;
 import java.util.Random;
@@ -24,7 +25,7 @@ public final class AuthorFactory {
 
     public static Author random() {
         return ImmutableAuthor.builder()
-                .withId(UUID.randomUUID())
+                .withId(ImmutableAuthorId.of(UUID.randomUUID()))
                 .withFirstName(FIRST_NAMES.get(RANDOM.nextInt(FIRST_NAMES.size())))
                 .withLastName(LAST_NAMES.get(RANDOM.nextInt(LAST_NAMES.size())))
                 .withDataVersion(RANDOM.nextInt())

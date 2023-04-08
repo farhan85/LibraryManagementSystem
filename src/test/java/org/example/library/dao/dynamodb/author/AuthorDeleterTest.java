@@ -9,15 +9,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.util.UUID;
-
 import static org.mockito.Mockito.verify;
 
 @Listeners(MockitoTestNGListener.class)
 public class AuthorDeleterTest {
 
     private static final Author AUTHOR = AuthorFactory.random();
-    private static final UUID TEST_UUID = AUTHOR.getId();
 
     @Mock
     private Table mockAuthorsTable;
@@ -31,15 +28,15 @@ public class AuthorDeleterTest {
 
     @Test
     public void GIVEN_uuid_WHEN_calling_delete_THEN_call_table_deleteItem_with_expected_arguments() {
-        authorDeleter.delete(TEST_UUID);
+        authorDeleter.delete(AUTHOR.getId());
 
-        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), TEST_UUID.toString());
+        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), AUTHOR.getId().value());
     }
 
     @Test
     public void GIVEN_Author_WHEN_calling_delete_THEN_call_table_deleteItem_with_expected_arguments() {
-        authorDeleter.delete(AUTHOR);
+        authorDeleter.delete(AUTHOR.getId());
 
-        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), TEST_UUID.toString());
+        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), AUTHOR.getId().value());
     }
 }

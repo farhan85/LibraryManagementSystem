@@ -8,16 +8,17 @@ import org.example.library.dao.ResourceDao;
 import org.example.library.gui.AuthorTable;
 import org.example.library.gui.MainWindow;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ListAuthors extends Panel {
 
     private final MainWindow mainWindow;
-    private final ResourceDao<Author> authorDao;
+    private final ResourceDao<AuthorId, Author> authorDao;
     private final AuthorTable authorTable;
 
-    public ListAuthors(final MainWindow mainWindow, final ResourceDao<Author> authorDao) {
+    public ListAuthors(final MainWindow mainWindow, final ResourceDao<AuthorId, Author> authorDao) {
         this.mainWindow = checkNotNull(mainWindow);
         this.authorDao = checkNotNull(authorDao);
 

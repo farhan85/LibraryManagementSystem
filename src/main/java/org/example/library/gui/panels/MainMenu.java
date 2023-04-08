@@ -11,6 +11,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import org.example.library.dao.ResourceDao;
 import org.example.library.gui.MainWindow;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 import org.example.library.models.ImmutableAuthor;
 
 import java.util.UUID;
@@ -20,9 +21,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MainMenu extends Panel {
 
     private final MainWindow mainWindow;
-    private final ResourceDao<Author> authorDao;
+    private final ResourceDao<AuthorId, Author> authorDao;
 
-    public MainMenu(final MainWindow mainWindow, final ResourceDao<Author> authorDao) {
+    public MainMenu(final MainWindow mainWindow, final ResourceDao<AuthorId, Author> authorDao) {
         this.mainWindow = checkNotNull(mainWindow);
         this.authorDao = checkNotNull(authorDao);
         initialize();

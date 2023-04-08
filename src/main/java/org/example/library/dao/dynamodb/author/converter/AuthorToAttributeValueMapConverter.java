@@ -22,7 +22,7 @@ public class AuthorToAttributeValueMapConverter {
 
     public static Map<String, AttributeValue> toAttributeValueMap(final Author author) {
         return ImmutableMap.of(
-                AuthorAttributes.ID.toString(), new AttributeValue().withS(author.getId().toString()),
+                AuthorAttributes.ID.toString(), new AttributeValue().withS(author.getId().value()),
                 AuthorAttributes.FIRST_NAME.toString(), new AttributeValue().withS(author.getFirstName()),
                 AuthorAttributes.LAST_NAME.toString(), new AttributeValue().withS(author.getLastName()),
                 AuthorAttributes.DATA_VERSION.toString(), new AttributeValue().withN(Integer.toString(author.getDataVersion())));

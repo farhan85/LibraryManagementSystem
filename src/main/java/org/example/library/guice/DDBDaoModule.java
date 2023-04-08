@@ -15,16 +15,17 @@ import org.example.library.dao.dynamodb.author.AuthorRetriever;
 import org.example.library.dao.dynamodb.author.AuthorScanner;
 import org.example.library.dao.dynamodb.author.AuthorUpdater;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 
 public class DDBDaoModule extends AbstractModule {
 
     private final TypeLiteral<ResourceCreator<Author>> AUTHOR_RESOURCE_CREATOR = new TypeLiteral<>() {};
-    private final TypeLiteral<ResourceDeleter<Author>> AUTHOR_RESOURCE_DELETER = new TypeLiteral<>() {};
+    private final TypeLiteral<ResourceDeleter<AuthorId>> AUTHOR_RESOURCE_DELETER = new TypeLiteral<>() {};
     private final TypeLiteral<ResourceUpdater<Author>> AUTHOR_RESOURCE_UPDATER = new TypeLiteral<>() {};
-    private final TypeLiteral<ResourceRetriever<Author>> AUTHOR_RESOURCE_RETRIEVER = new TypeLiteral<>() {};
+    private final TypeLiteral<ResourceRetriever<AuthorId, Author>> AUTHOR_RESOURCE_RETRIEVER = new TypeLiteral<>() {};
     private final TypeLiteral<ResourceScanner<Author>> AUTHOR_RESOURCE_SCANNER = new TypeLiteral<>() {};
-    private final TypeLiteral<ResourceDao<Author>> AUTHOR_RESOURCE_DAO = new TypeLiteral<>() {};
-    private final TypeLiteral<ResourceDaoDelegator<Author>> AUTHOR_RESOURCE_DAO_DELEGATOR = new TypeLiteral<>() {};
+    private final TypeLiteral<ResourceDao<AuthorId, Author>> AUTHOR_RESOURCE_DAO = new TypeLiteral<>() {};
+    private final TypeLiteral<ResourceDaoDelegator<AuthorId, Author>> AUTHOR_RESOURCE_DAO_DELEGATOR = new TypeLiteral<>() {};
 
     @Override
     protected void configure() {

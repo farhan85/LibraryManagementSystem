@@ -1,19 +1,13 @@
 package org.example.library.dao;
 
-import org.example.library.models.Resource;
-
-import java.util.UUID;
+import org.example.library.models.ResourceId;
 
 /**
  * Implementations of this class are responsible for deleting Resource objects from the database.
  *
- * @param <R> The type of Resource object to delete.
+ * @param <I> The ResourceId type that identifies a resource.
  */
-public interface ResourceDeleter<R extends Resource> {
+public interface ResourceDeleter<I extends ResourceId> {
 
-    void delete(UUID uuid);
-
-    default void delete(final R resource) {
-        delete(resource.getId());
-    }
+    void delete(I resourceId);
 }

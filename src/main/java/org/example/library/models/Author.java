@@ -3,14 +3,12 @@ package org.example.library.models;
 import org.example.library.annotations.ImmutableBuilderSettings;
 import org.immutables.value.Value;
 
-import java.util.UUID;
-
 @Value.Immutable
 @ImmutableBuilderSettings
-public abstract class Author implements Resource {
+public abstract class Author implements Resource<AuthorId> {
 
     @Override
-    public abstract UUID getId();
+    public abstract AuthorId getId();
 
     @Override
     @Value.Default

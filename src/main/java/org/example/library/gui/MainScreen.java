@@ -10,6 +10,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import org.example.library.dao.ResourceDao;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class MainScreen {
     private final MainWindow mainWindow;
 
     @Inject
-    private MainScreen(final ResourceDao<Author> authorDao) throws IOException {
+    private MainScreen(final ResourceDao<AuthorId, Author> authorDao) throws IOException {
         checkNotNull(authorDao);
 
         screen = new DefaultTerminalFactory().createScreen();

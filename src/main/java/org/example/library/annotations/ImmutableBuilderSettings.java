@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PACKAGE, ElementType.TYPE})
 @Retention(RetentionPolicy.CLASS)
-@Value.Style(init = "with*")
+@Value.Style(init = "with*", deepImmutablesDetection = true)
 public @interface ImmutableBuilderSettings {
 }

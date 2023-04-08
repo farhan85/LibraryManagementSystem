@@ -7,13 +7,13 @@ import com.google.inject.name.Named;
 import org.example.library.dao.ResourceRetriever;
 import org.example.library.dao.dynamodb.author.converter.AuthorToItemConverter;
 import org.example.library.models.Author;
+import org.example.library.models.AuthorId;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class AuthorRetriever implements ResourceRetriever<Author> {
+public class AuthorRetriever implements ResourceRetriever<AuthorId, Author> {
 
     private final Table authorsTable;
 
@@ -23,8 +23,8 @@ public class AuthorRetriever implements ResourceRetriever<Author> {
     }
 
     @Override
-    public Optional<Author> get(final UUID uuid) {
-        final Item item = authorsTable.getItem(AuthorAttributes.ID.toString(), uuid.toString());
+    public Optional<Author> get(final AuthorId authorId) {
+        final Item item = authorsTable.getItem(AuthorAttributes.ID.toString(), authorId.value());
         return Optional.ofNullable(item)
                 .map(AuthorToItemConverter::toAuthor);
     }

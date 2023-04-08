@@ -13,7 +13,7 @@ public class AuthorToAttributeValueMapConverterTest {
 
     private static final Author AUTHOR = AuthorFactory.random();
     private static final ImmutableMap<String, AttributeValue> AUTHOR_MAP = ImmutableMap.of(
-            AuthorAttributes.ID.toString(), new AttributeValue().withS(AUTHOR.getId().toString()),
+            AuthorAttributes.ID.toString(), new AttributeValue().withS(AUTHOR.getId().value()),
             AuthorAttributes.FIRST_NAME.toString(), new AttributeValue().withS(AUTHOR.getFirstName()),
             AuthorAttributes.LAST_NAME.toString(), new AttributeValue().withS(AUTHOR.getLastName()),
             AuthorAttributes.DATA_VERSION.toString(), new AttributeValue().withN(Integer.toString(AUTHOR.getDataVersion())));

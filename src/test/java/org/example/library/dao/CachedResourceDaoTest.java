@@ -3,6 +3,7 @@ package org.example.library.dao;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.example.library.testutils.TestResource;
+import org.example.library.testutils.TestResourceId;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeMethod;
@@ -12,7 +13,6 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.mockito.Mockito.verify;
@@ -24,13 +24,13 @@ import static org.testng.AssertJUnit.assertEquals;
 public class CachedResourceDaoTest {
 
     @Mock
-    private ResourceDao<TestResource> mockResourceDao;
+    private ResourceDao<TestResourceId, TestResource> mockResourceDao;
     @Mock
-    private Cache<UUID, TestResource> mockCache;
+    private Cache<TestResourceId, TestResource> mockCache;
     @Mock
     private Consumer<TestResource> mockConsumer;
 
-    private CachedResourceDao<TestResource> cachedResourceDao;
+    private CachedResourceDao<TestResourceId, TestResource> cachedResourceDao;
 
     @BeforeMethod
     public void setup() {
@@ -73,7 +73,7 @@ public class CachedResourceDaoTest {
     @Test
     public void GIVEN_testResource_uuid_and_cache_has_testResource_WHEN_calling_get_THEN_retrieve_from_cache() {
         final TestResource expected = TestResource.random();
-        final Cache<UUID, TestResource> cache = CacheBuilder.newBuilder().build();
+        final Cache<TestResourceId, TestResource> cache = CacheBuilder.newBuilder().build();
         cache.put(expected.getId(), expected);
         cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cache);
 
@@ -84,7 +84,7 @@ public class CachedResourceDaoTest {
     @Test
     public void GIVEN_testResource_uuid_and_cache_is_empty_WHEN_calling_get_THEN_retrieve_from_resourceDao_and_store_in_cache() {
         final TestResource expected = TestResource.random();
-        final Cache<UUID, TestResource> cache = CacheBuilder.newBuilder().build();
+        final Cache<TestResourceId, TestResource> cache = CacheBuilder.newBuilder().build();
         cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cache);
         when(mockResourceDao.get(expected.getId())).thenReturn(Optional.of(expected));
 
@@ -96,7 +96,7 @@ public class CachedResourceDaoTest {
     @Test
     public void GIVEN_testResource_uuid_and_cache_has_obj_WHEN_calling_get_THEN_retrieve_from_cache() {
         final TestResource expected = TestResource.random();
-        final Cache<UUID, TestResource> cache = CacheBuilder.newBuilder().build();
+        final Cache<TestResourceId, TestResource> cache = CacheBuilder.newBuilder().build();
         cache.put(expected.getId(), expected);
         cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cache);
 

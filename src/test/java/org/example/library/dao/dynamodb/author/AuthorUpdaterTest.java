@@ -30,7 +30,7 @@ public class AuthorUpdaterTest {
 
     private static final Author AUTHOR = AuthorFactory.random();
     private static final Collection<KeyAttribute> KEY_COMPONENTS = List.of(
-            new KeyAttribute(AuthorAttributes.ID.toString(), AUTHOR.getId().toString()));
+            new KeyAttribute(AuthorAttributes.ID.toString(), AUTHOR.getId().value()));
     private static final String UPDATE_EXPRESSION = String.format("set %s,%s,%s",
             "#first_name = :first_name",
             "#last_name = :last_name",

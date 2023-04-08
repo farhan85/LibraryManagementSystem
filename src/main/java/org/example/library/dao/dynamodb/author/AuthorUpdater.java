@@ -52,7 +52,7 @@ public class AuthorUpdater implements ResourceUpdater<Author> {
                 .withNumber(":increment", 1);
 
         authorsTable.updateItem(new UpdateItemSpec()
-                .withPrimaryKey(AuthorAttributes.ID.toString(), author.getId().toString())
+                .withPrimaryKey(AuthorAttributes.ID.toString(), author.getId().value())
                 .withUpdateExpression(updateExpression)
                 .withConditionExpression(conditionExpression)
                 .withNameMap(nameMap)
