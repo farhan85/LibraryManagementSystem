@@ -1,6 +1,8 @@
 package org.example.library.dao;
 
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheBuilderSpec;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import org.example.library.models.Resource;
@@ -19,32 +21,45 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <I> The ResourceId type that identifies a resource.
  * @param <R> The type of Resource object to manage.
  */
-public class CachedResourceDao<I extends ResourceId, R extends Resource<I>> implements ResourceDao<I, R> {
+public class CachedResourceDao<I extends ResourceId, R extends Resource<I>> implements VersionedResourceDao<I, R> {
 
-    private final Cache<I, R> cache;
-    private final ResourceDao<I, R> resourceDao;
+    private final Cache<String, R> cache;
+    private final VersionedResourceDao<I, R> resourceDao;
 
     @Inject
-    public CachedResourceDao(final ResourceDao<I, R> resourceDao, final Cache<I, R> cache) {
+    public CachedResourceDao(final VersionedResourceDao<I, R> resourceDao, final CacheBuilderSpec cacheBuilderSpec) {
         this.resourceDao = checkNotNull(resourceDao);
-        this.cache = checkNotNull(cache);
+        //this.cache = checkNotNull(cache);
+        this.cache = CacheBuilder.from(checkNotNull(cacheBuilderSpec)).build();
     }
 
     @Override
     public void create(final R resource) {
         resourceDao.create(resource);
+        final String key = generateKey(resource.getId(), resource.getDataVersion());
+        cache.put(key, resource);
     }
 
     @Override
     public void delete(final I resourceId) {
-        cache.invalidate(resourceId);
         resourceDao.delete(resourceId);
     }
 
     @Override
     public Optional<R> get(final I resourceId) {
+        return resourceDao.get(resourceId)
+                .map(resource -> {
+                    final String key = generateKey(resourceId, resource.getDataVersion());
+                    cache.put(key, resource);
+                    return resource;
+                });
+    }
+
+    @Override
+    public Optional<R> get(final I resourceId, final int dataVersion) {
         try {
-            final R resource = cache.get(resourceId, () -> resourceDao.get(resourceId).orElseThrow());
+            final String key = generateKey(resourceId, dataVersion);
+            final R resource = cache.get(key, () -> resourceDao.get(resourceId, dataVersion).orElseThrow());
             return Optional.of(resource);
         } catch (final ExecutionException | UncheckedExecutionException e) {
             return Optional.empty();
@@ -63,7 +78,12 @@ public class CachedResourceDao<I extends ResourceId, R extends Resource<I>> impl
 
     @Override
     public void update(final R resource) {
-        cache.invalidate(resource.getId());
         resourceDao.update(resource);
+        final String key = generateKey(resource.getId(), resource.getDataVersion() + 1);
+        cache.put(key, resource);
+    }
+
+    private String generateKey(final I resourceId, final int dataVersion) {
+        return String.format("%s_%d", resourceId.value(), dataVersion);
     }
 }

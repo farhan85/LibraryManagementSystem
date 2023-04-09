@@ -1,7 +1,6 @@
 package org.example.library.dao;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheBuilderSpec;
 import org.example.library.testutils.TestResource;
 import org.example.library.testutils.TestResourceId;
 import org.mockito.Mock;
@@ -11,30 +10,31 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 @Listeners(MockitoTestNGListener.class)
 public class CachedResourceDaoTest {
 
     @Mock
-    private ResourceDao<TestResourceId, TestResource> mockResourceDao;
-    @Mock
-    private Cache<TestResourceId, TestResource> mockCache;
+    private VersionedResourceDao<TestResourceId, TestResource> mockResourceDao;
     @Mock
     private Consumer<TestResource> mockConsumer;
 
+    private CacheBuilderSpec cacheBuilderSpec;
     private CachedResourceDao<TestResourceId, TestResource> cachedResourceDao;
 
     @BeforeMethod
     public void setup() {
-        cachedResourceDao = new CachedResourceDao<>(mockResourceDao, mockCache);
+        final String spec = "maximumSize=10000,expireAfterWrite=10m";
+        cacheBuilderSpec = CacheBuilderSpec.parse(spec);
+        cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cacheBuilderSpec);
     }
 
     @Test
@@ -42,14 +42,23 @@ public class CachedResourceDaoTest {
         final TestResource expected = TestResource.random();
         cachedResourceDao.create(expected);
         verify(mockResourceDao).create(expected);
-        verifyNoInteractions(mockCache);
     }
 
     @Test
-    public void GIVEN_testResource_uuid_WHEN_calling_delete_THEN_delete_with_resourceDao_and_remove_from_cache() {
+    public void GIVEN_testResource_WHEN_calling_create_then_get_THEN_do_not_call_resourceDao_get() {
+        final TestResource expected = TestResource.of(TestResourceId.random(), 1);
+        cachedResourceDao.create(expected);
+        final Optional<TestResource> actual = cachedResourceDao.get(expected.getId(), 1);
+
+        assertEquals(actual, Optional.of(expected));
+        verify(mockResourceDao).create(expected);
+        verifyNoMoreInteractions(mockResourceDao);
+    }
+
+    @Test
+    public void GIVEN_testResource_uuid_WHEN_calling_delete_THEN_call_resourceDao_delete() {
         final TestResource expected = TestResource.random();
         cachedResourceDao.delete(expected.getId());
-        verify(mockCache).invalidate(expected.getId());
         verify(mockResourceDao).delete(expected.getId());
     }
 
@@ -60,55 +69,46 @@ public class CachedResourceDaoTest {
 
         final List<TestResource> actual = cachedResourceDao.list();
         assertEquals(actual, expected);
-        verifyNoInteractions(mockCache);
     }
 
     @Test
     public void GIVEN_cachedResourceDao_WHEN_calling_scan_THEN_call_resourceDao_scan() {
         cachedResourceDao.scan(mockConsumer);
         verify(mockResourceDao).scan(mockConsumer);
-        verifyNoInteractions(mockCache);
     }
 
     @Test
-    public void GIVEN_testResource_uuid_and_cache_has_testResource_WHEN_calling_get_THEN_retrieve_from_cache() {
+    public void GIVEN_uuid_WHEN_calling_get_twice_THEN_call_resourceDao_get_twice() {
         final TestResource expected = TestResource.random();
-        final Cache<TestResourceId, TestResource> cache = CacheBuilder.newBuilder().build();
-        cache.put(expected.getId(), expected);
-        cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cache);
-
-        assertEquals(cachedResourceDao.get(expected.getId()), Optional.of(expected));
-        verifyNoInteractions(mockResourceDao);
-    }
-
-    @Test
-    public void GIVEN_testResource_uuid_and_cache_is_empty_WHEN_calling_get_THEN_retrieve_from_resourceDao_and_store_in_cache() {
-        final TestResource expected = TestResource.random();
-        final Cache<TestResourceId, TestResource> cache = CacheBuilder.newBuilder().build();
-        cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cache);
         when(mockResourceDao.get(expected.getId())).thenReturn(Optional.of(expected));
+        final Optional<TestResource> actual1 = cachedResourceDao.get(expected.getId());
+        final Optional<TestResource> actual2 = cachedResourceDao.get(expected.getId());
 
-        assertEquals(cachedResourceDao.get(expected.getId()), Optional.of(expected));
-        assertEquals(cache.asMap(), Map.of(expected.getId(), expected));
-        verify(mockResourceDao).get(expected.getId());
+        assertEquals(actual1, Optional.of(expected));
+        assertEquals(actual2, Optional.of(expected));
+        verify(mockResourceDao, times(2)).get(expected.getId());
     }
 
     @Test
-    public void GIVEN_testResource_uuid_and_cache_has_obj_WHEN_calling_get_THEN_retrieve_from_cache() {
+    public void GIVEN_uuid_and_dataVersion_WHEN_calling_get_twice_THEN_call_resourceDao_get_once() {
         final TestResource expected = TestResource.random();
-        final Cache<TestResourceId, TestResource> cache = CacheBuilder.newBuilder().build();
-        cache.put(expected.getId(), expected);
-        cachedResourceDao = new CachedResourceDao<>(mockResourceDao, cache);
+        when(mockResourceDao.get(expected.getId(), expected.getDataVersion())).thenReturn(Optional.of(expected));
+        final Optional<TestResource> actual1 = cachedResourceDao.get(expected.getId(), expected.getDataVersion());
+        final Optional<TestResource> actual2 = cachedResourceDao.get(expected.getId(), expected.getDataVersion());
 
-        assertEquals(cachedResourceDao.get(expected.getId()), Optional.of(expected));
-        verifyNoInteractions(mockResourceDao);
+        assertEquals(actual1, Optional.of(expected));
+        assertEquals(actual2, Optional.of(expected));
+        verify(mockResourceDao).get(expected.getId(), expected.getDataVersion());
     }
 
     @Test
-    public void GIVEN_testResource_WHEN_calling_update_THEN_invalidate_from_cache_and_update_with_resourceDao() {
+    public void GIVEN_testResource_WHEN_calling_update_then_get_with_dataVersion_THEN_do_not_retrieve_latest_version_from_resourceDao() {
         final TestResource expected = TestResource.random();
         cachedResourceDao.update(expected);
-        verify(mockCache).invalidate(expected.getId());
+        final Optional<TestResource> actual = cachedResourceDao.get(expected.getId(), expected.getDataVersion() + 1);
+
+        assertEquals(actual, Optional.of(expected));
         verify(mockResourceDao).update(expected);
+        verifyNoMoreInteractions(mockResourceDao);
     }
 }
