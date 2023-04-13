@@ -1,9 +1,11 @@
 package org.example.library.dao.dynamodb.author;
 
+import com.amazonaws.services.dynamodbv2.document.Expected;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.PutItemSpec;
-import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
+import com.amazonaws.services.dynamodbv2.model.ReturnValue;
+import com.google.common.collect.ImmutableList;
 import org.example.library.models.Author;
 import org.example.library.models.ImmutableAuthor;
 import org.example.library.testutils.AuthorFactory;
@@ -14,6 +16,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.util.Collection;
+
+import static org.example.library.testutils.AssertDdbObjects.assertDdbExpectedCondition;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 
@@ -26,8 +31,8 @@ public class AuthorCreatorTest {
             .withString(AuthorAttributes.FIRST_NAME.toString(), AUTHOR.getFirstName())
             .withString(AuthorAttributes.LAST_NAME.toString(), AUTHOR.getLastName())
             .withNumber(AuthorAttributes.DATA_VERSION.toString(), AUTHOR.getDataVersion());
-    private static final String CONDITION_EXPRESSION = "attribute_not_exists(#id)";
-    private static final NameMap NAME_MAP = new NameMap().with("#id", AuthorAttributes.ID.toString());
+    private static final Collection<Expected> EXPECTED_CONDITION = ImmutableList.of(
+            new Expected(AuthorAttributes.ID.toString()).notExist());
 
     @Mock
     private Table mockAuthorsTable;
@@ -47,8 +52,8 @@ public class AuthorCreatorTest {
         verify(mockAuthorsTable).putItem(argumentCaptor.capture());
         final PutItemSpec putItemSpec = argumentCaptor.getValue();
         assertEquals(putItemSpec.getItem(), AUTHOR_ITEM);
-        assertEquals(putItemSpec.getConditionExpression(), CONDITION_EXPRESSION);
-        assertEquals(putItemSpec.getNameMap(), NAME_MAP);
+        assertDdbExpectedCondition(putItemSpec.getExpected(), EXPECTED_CONDITION);
+        assertEquals(putItemSpec.getReturnValues(), ReturnValue.NONE.toString());
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

@@ -1,10 +1,13 @@
 package org.example.library.dao.dynamodb.author;
 
+import com.amazonaws.services.dynamodbv2.document.AttributeUpdate;
+import com.amazonaws.services.dynamodbv2.document.Expected;
 import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
+import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
-import com.google.common.collect.ImmutableMap;
+import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 import org.example.library.models.Author;
 import org.example.library.testutils.AuthorFactory;
 import org.mockito.ArgumentCaptor;
@@ -14,12 +17,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Map;
 
+import static org.example.library.testutils.AssertDdbObjects.assertDdbAttributeUpdates;
+import static org.example.library.testutils.AssertDdbObjects.assertDdbExpectedCondition;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -29,22 +31,15 @@ import static org.testng.Assert.assertEquals;
 public class AuthorUpdaterTest {
 
     private static final Author AUTHOR = AuthorFactory.random();
-    private static final Collection<KeyAttribute> KEY_COMPONENTS = List.of(
-            new KeyAttribute(AuthorAttributes.ID.toString(), AUTHOR.getId().value()));
-    private static final String UPDATE_EXPRESSION = String.format("set %s,%s,%s",
-            "#first_name = :first_name",
-            "#last_name = :last_name",
-            "#data_version = #data_version + :increment");
-    private static final String CONDITION_EXPRESSION = "#data_version = :data_version";
-    private static final Map<String, String> NAME_MAP = ImmutableMap.of(
-            "#first_name", AuthorAttributes.FIRST_NAME.toString(),
-            "#last_name", AuthorAttributes.LAST_NAME.toString(),
-            "#data_version", AuthorAttributes.DATA_VERSION.toString());
-    private static final Map<String, Object> VALUE_MAP = ImmutableMap.of(
-            ":first_name", AUTHOR.getFirstName(),
-            ":last_name", AUTHOR.getLastName(),
-            ":data_version", BigDecimal.valueOf(AUTHOR.getDataVersion()),
-            ":increment", BigDecimal.valueOf(1));
+    private static final Collection<KeyAttribute> PRIMARY_KEY_COMPONENTS = new PrimaryKey(
+            AuthorAttributes.ID.toString(), AUTHOR.getId().value()).getComponents();
+    private static final UpdateItemSpec UPDATE_ITEM_SPEC = new UpdateItemSpec()
+            .withPrimaryKey(AuthorAttributes.ID.toString(), AUTHOR.getId().value())
+            .withAttributeUpdate(
+                    new AttributeUpdate(AuthorAttributes.FIRST_NAME.toString()).put(AUTHOR.getFirstName()),
+                    new AttributeUpdate(AuthorAttributes.LAST_NAME.toString()).put(AUTHOR.getLastName()),
+                    new AttributeUpdate(AuthorAttributes.DATA_VERSION.toString()).addNumeric(1))
+            .withExpected(new Expected(AuthorAttributes.DATA_VERSION.toString()).eq(AUTHOR.getDataVersion()));
 
     @Mock
     private Table mockAuthorsTable;
@@ -63,11 +58,10 @@ public class AuthorUpdaterTest {
 
         verify(mockAuthorsTable).updateItem(argumentCaptor.capture());
         final UpdateItemSpec updateItemSpec = argumentCaptor.getValue();
-        assertEquals(updateItemSpec.getKeyComponents(), KEY_COMPONENTS);
-        assertEquals(updateItemSpec.getUpdateExpression(), UPDATE_EXPRESSION);
-        assertEquals(updateItemSpec.getConditionExpression(), CONDITION_EXPRESSION);
-        assertEquals(updateItemSpec.getNameMap(), NAME_MAP);
-        assertEquals(updateItemSpec.getValueMap(), VALUE_MAP);
+        assertEquals(updateItemSpec.getKeyComponents(), PRIMARY_KEY_COMPONENTS);
+        assertDdbAttributeUpdates(updateItemSpec.getAttributeUpdate(), UPDATE_ITEM_SPEC.getAttributeUpdate());
+        assertDdbExpectedCondition(updateItemSpec.getExpected(), UPDATE_ITEM_SPEC.getExpected());
+        assertEquals(updateItemSpec.getReturnValues(), ReturnValue.NONE.toString());
     }
 
     @Test(expectedExceptions = ConcurrentModificationException.class)
