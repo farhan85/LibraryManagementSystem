@@ -55,10 +55,19 @@ public class UpdateAuthor extends Panel {
     }
 
     public void displayAuthor(final AuthorId authorId) {
-        final Author author = authorDao.get(authorId).orElseThrow();
+        authorDao.get(authorId)
+                .map(this::updateAuthorLabels)
+                .orElseGet(() -> {
+                    MessageDialog.showMessageDialog(mainWindow.getTextGUI(), "Error", "Author not found");
+                    return null;
+                });
+    }
+
+    private Author updateAuthorLabels(final Author author) {
         authorIdLabel.setText(author.getId().value());
         firstNameTextBox.setText(author.getFirstName());
         lastNameTextBox.setText(author.getLastName());
+        return author;
     }
 
     private void updateAuthor() {
