@@ -37,12 +37,12 @@ public class ItemToAuthorConverterTest {
     }
 
     @Test
-    public void GIVEN_Item_with_non_optional_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
+    public void GIVEN_Item_with_non_optional_Author_values_WHEN_calling_apply_THEN_return_expected_Author() {
         assertEquals(itemToAuthorConverter.apply(AUTHOR_NON_OPT_ITEM), AUTHOR_NON_OPT);
     }
 
     @Test
-    public void GIVEN_Item_with_full_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
+    public void GIVEN_Item_with_full_Author_values_WHEN_calling_apply_THEN_return_expected_Author() {
         assertEquals(itemToAuthorConverter.apply(AUTHOR_FULL_ITEM), AUTHOR_FULL);
     }
 }

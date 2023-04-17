@@ -30,28 +30,27 @@ public class AuthorUpdaterTest {
     private Function<Author, UpdateItemSpec> mockAuthorToUpdateItemSpecConverter;
     @Mock
     private UpdateItemSpec mockUpdateItemSpec;
-    @Mock
-    private UpdateItemSpec mockUpdateItemSpecWithReturnValue;
 
     private AuthorUpdater authorUpdater;
 
     @BeforeMethod
     public void setup() {
         when(mockAuthorToUpdateItemSpecConverter.apply(AUTHOR)).thenReturn(mockUpdateItemSpec);
-        when(mockUpdateItemSpec.withReturnValues(ReturnValue.NONE)).thenReturn(mockUpdateItemSpecWithReturnValue);
+        when(mockUpdateItemSpec.withReturnValues(ReturnValue.NONE)).thenReturn(mockUpdateItemSpec);
         authorUpdater = new AuthorUpdater(mockAuthorsTable, mockAuthorToUpdateItemSpecConverter);
     }
 
     @Test
     public void GIVEN_Author_WHEN_calling_update_THEN_call_table_updateItem_with_expected_arguments() {
         authorUpdater.update(AUTHOR);
-        verify(mockAuthorsTable).updateItem(mockUpdateItemSpecWithReturnValue);
+        verify(mockUpdateItemSpec).withReturnValues(ReturnValue.NONE);
+        verify(mockAuthorsTable).updateItem(mockUpdateItemSpec);
     }
 
     @Test(expectedExceptions = ConcurrentModificationException.class)
     public void GIVEN_ddbClient_throws_ConditionalCheckFailedException_WHEN_calling_update_THEN_throw_ConcurrentModificationException() {
         doThrow(ConditionalCheckFailedException.class)
-                .when(mockAuthorsTable).updateItem(mockUpdateItemSpecWithReturnValue);
+                .when(mockAuthorsTable).updateItem(mockUpdateItemSpec);
         authorUpdater.update(AUTHOR);
     }
 }

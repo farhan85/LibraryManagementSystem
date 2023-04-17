@@ -28,8 +28,6 @@ public class AuthorCreatorTest {
     private Function<Author, PutItemSpec> mockAuthorToPutItemSpecConverter;
     @Mock
     private PutItemSpec mockPutItemSpec;
-    @Mock
-    private PutItemSpec mockPutItemSpecWithReturnValue;
 
     private AuthorCreator authorCreator;
 
@@ -41,9 +39,11 @@ public class AuthorCreatorTest {
     @Test
     public void GIVEN_Author_WHEN_calling_create_THEN_call_table_putItem_with_expected_arguments() {
         when(mockAuthorToPutItemSpecConverter.apply(AUTHOR)).thenReturn(mockPutItemSpec);
-        when(mockPutItemSpec.withReturnValues(ReturnValue.NONE)).thenReturn(mockPutItemSpecWithReturnValue);
+        when(mockPutItemSpec.withReturnValues(ReturnValue.NONE)).thenReturn(mockPutItemSpec);
         authorCreator.create(AUTHOR);
-        verify(mockAuthorsTable).putItem(mockPutItemSpecWithReturnValue);
+
+        verify(mockPutItemSpec).withReturnValues(ReturnValue.NONE);
+        verify(mockAuthorsTable).putItem(mockPutItemSpec);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

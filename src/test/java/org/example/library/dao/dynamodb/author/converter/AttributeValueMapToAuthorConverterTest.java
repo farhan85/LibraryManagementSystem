@@ -34,12 +34,12 @@ public class AttributeValueMapToAuthorConverterTest {
     }
 
     @Test
-    public void GIVEN_AttributeValueMap_with_no_optional_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
+    public void GIVEN_AttributeValueMap_with_no_optional_Author_values_WHEN_calling_apply_THEN_return_expected_Author() {
         assertEquals(attributeValueMapToAuthorConverter.apply(AUTHOR_MAP_NON_OPT), AUTHOR_NON_OPT);
     }
 
     @Test
-    public void GIVEN_AttributeValueMap_with_full_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
+    public void GIVEN_AttributeValueMap_with_full_Author_values_WHEN_calling_apply_THEN_return_expected_Author() {
         assertEquals(attributeValueMapToAuthorConverter.apply(AUTHOR_MAP_FULL), AUTHOR_FULL);
     }
 }

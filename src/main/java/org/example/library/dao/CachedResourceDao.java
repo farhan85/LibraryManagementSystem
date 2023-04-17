@@ -29,7 +29,6 @@ public class CachedResourceDao<I extends ResourceId, R extends Resource<I>> impl
     @Inject
     public CachedResourceDao(final VersionedResourceDao<I, R> resourceDao, final CacheBuilderSpec cacheBuilderSpec) {
         this.resourceDao = checkNotNull(resourceDao);
-        //this.cache = checkNotNull(cache);
         this.cache = CacheBuilder.from(checkNotNull(cacheBuilderSpec)).build();
     }
 
