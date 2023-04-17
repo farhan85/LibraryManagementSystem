@@ -3,6 +3,8 @@ package org.example.library.models;
 import org.example.library.annotations.ImmutableBuilderSettings;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 @Value.Immutable
 @ImmutableBuilderSettings
 public abstract class Author implements Resource<AuthorId> {
@@ -19,4 +21,6 @@ public abstract class Author implements Resource<AuthorId> {
     public abstract String getFirstName();
 
     public abstract String getLastName();
+
+    public abstract Optional<Email> getEmail();
 }

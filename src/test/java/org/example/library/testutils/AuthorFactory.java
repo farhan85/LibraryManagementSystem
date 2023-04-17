@@ -23,21 +23,26 @@ public final class AuthorFactory {
     private AuthorFactory() {
     }
 
+    public static Author randomWithDataVersionOne() {
+        return ImmutableAuthor.builder()
+                .from(random())
+                .withDataVersion(1)
+                .build();
+    }
+
     public static Author random() {
+        return ImmutableAuthor.builder()
+                .from(randomNonOptionals())
+                .withEmail(EmailFactory.random())
+                .build();
+    }
+
+    public static Author randomNonOptionals() {
         return ImmutableAuthor.builder()
                 .withId(ImmutableAuthorId.of(UUID.randomUUID()))
                 .withFirstName(FIRST_NAMES.get(RANDOM.nextInt(FIRST_NAMES.size())))
                 .withLastName(LAST_NAMES.get(RANDOM.nextInt(LAST_NAMES.size())))
                 .withDataVersion(RANDOM.nextInt())
-                .build();
-    }
-
-    public static Author randomWithDataVersionOne() {
-        return ImmutableAuthor.builder()
-                .withId(UUID.randomUUID())
-                .withFirstName(FIRST_NAMES.get(RANDOM.nextInt(FIRST_NAMES.size())))
-                .withLastName(LAST_NAMES.get(RANDOM.nextInt(LAST_NAMES.size())))
-                .withDataVersion(1)
                 .build();
     }
 }

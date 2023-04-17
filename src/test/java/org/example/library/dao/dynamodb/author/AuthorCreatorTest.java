@@ -30,7 +30,8 @@ public class AuthorCreatorTest {
             .withString(AuthorAttributes.ID.toString(), AUTHOR.getId().value())
             .withString(AuthorAttributes.FIRST_NAME.toString(), AUTHOR.getFirstName())
             .withString(AuthorAttributes.LAST_NAME.toString(), AUTHOR.getLastName())
-            .withNumber(AuthorAttributes.DATA_VERSION.toString(), AUTHOR.getDataVersion());
+            .withNumber(AuthorAttributes.DATA_VERSION.toString(), AUTHOR.getDataVersion())
+            .withString(AuthorAttributes.EMAIL.toString(), AUTHOR.getEmail().orElseThrow().value());
     private static final Collection<Expected> EXPECTED_CONDITION = ImmutableList.of(
             new Expected(AuthorAttributes.ID.toString()).notExist());
 

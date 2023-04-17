@@ -1,7 +1,5 @@
 package org.example.library.dao.dynamodb.author;
 
-import com.amazonaws.services.dynamodbv2.document.AttributeUpdate;
-import com.amazonaws.services.dynamodbv2.document.Expected;
 import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.Table;
@@ -20,6 +18,7 @@ import org.testng.annotations.Test;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 
+import static org.example.library.dao.dynamodb.author.converter.AuthorToItemConverter.toUpdateItemSpec;
 import static org.example.library.testutils.AssertDdbObjects.assertDdbAttributeUpdates;
 import static org.example.library.testutils.AssertDdbObjects.assertDdbExpectedCondition;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,13 +32,7 @@ public class AuthorUpdaterTest {
     private static final Author AUTHOR = AuthorFactory.random();
     private static final Collection<KeyAttribute> PRIMARY_KEY_COMPONENTS = new PrimaryKey(
             AuthorAttributes.ID.toString(), AUTHOR.getId().value()).getComponents();
-    private static final UpdateItemSpec UPDATE_ITEM_SPEC = new UpdateItemSpec()
-            .withPrimaryKey(AuthorAttributes.ID.toString(), AUTHOR.getId().value())
-            .withAttributeUpdate(
-                    new AttributeUpdate(AuthorAttributes.FIRST_NAME.toString()).put(AUTHOR.getFirstName()),
-                    new AttributeUpdate(AuthorAttributes.LAST_NAME.toString()).put(AUTHOR.getLastName()),
-                    new AttributeUpdate(AuthorAttributes.DATA_VERSION.toString()).addNumeric(1))
-            .withExpected(new Expected(AuthorAttributes.DATA_VERSION.toString()).eq(AUTHOR.getDataVersion()));
+    private static final UpdateItemSpec UPDATE_ITEM_SPEC = toUpdateItemSpec(AUTHOR);
 
     @Mock
     private Table mockAuthorsTable;

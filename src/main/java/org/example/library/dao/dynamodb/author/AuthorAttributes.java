@@ -5,7 +5,8 @@ public enum AuthorAttributes {
     ID("Id"),
     FIRST_NAME("FirstName"),
     LAST_NAME("LastName"),
-    DATA_VERSION("DataVersion");
+    DATA_VERSION("DataVersion"),
+    EMAIL("Email");
 
     private final String key;
 
