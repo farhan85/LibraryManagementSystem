@@ -12,7 +12,6 @@ import org.example.library.gui.panels.UpdateAuthor;
 import org.example.library.gui.panels.UpdateAuthorSelector;
 import org.example.library.models.Author;
 import org.example.library.models.AuthorId;
-import org.example.library.models.ImmutableAuthorId;
 
 import java.util.List;
 

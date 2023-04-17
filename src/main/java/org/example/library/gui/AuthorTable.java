@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.table.TableModel;
 import org.example.library.dao.ResourceDao;
 import org.example.library.models.Author;
 import org.example.library.models.AuthorId;
+import org.example.library.models.Email;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,10 +21,10 @@ public class AuthorTable extends Table<String> {
     private final Map<Integer, AuthorId> rowAuthorId;
 
     public AuthorTable(final ResourceDao<AuthorId, Author> authorDao) {
-        super("Id", "First Name", "Last Name");
+        super("Id", "First Name", "Last Name", "Email");
         this.authorDao = checkNotNull(authorDao);
         setVisibleRows(10);
-        setVisibleColumns(3);
+        setVisibleColumns(4);
         tableModel = getTableModel();
         rowAuthorId = new HashMap<>();
     }
@@ -49,6 +50,9 @@ public class AuthorTable extends Table<String> {
         return List.of(
                 author.getId().value().substring(0, 6) + "...",
                 author.getFirstName(),
-                author.getLastName());
+                author.getLastName(),
+                author.getEmail()
+                        .map(Email::value)
+                        .orElse(""));
     }
 }

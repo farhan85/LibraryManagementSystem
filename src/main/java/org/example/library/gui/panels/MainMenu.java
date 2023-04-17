@@ -45,8 +45,8 @@ public class MainMenu extends Panel {
     }
 
     private void loadTestData() {
-        authorDao.create(createAuthor("John", "Doe"));
-        authorDao.create(createAuthor("Fred", "Smith"));
+        authorDao.create(createAuthor("John", "Doe", "john.doe@test.com"));
+        authorDao.create(createAuthor("Fred", "Smith", "fred2000+beta@test.com"));
         authorDao.create(createAuthor("Jane", "Doe"));
         authorDao.create(createAuthor("Alex", "Miller"));
         MessageDialog.showMessageDialog(mainWindow.getTextGUI(), "Info", "Test data loaded",
@@ -58,6 +58,15 @@ public class MainMenu extends Panel {
                 .withId(UUID.randomUUID())
                 .withFirstName(firstName)
                 .withLastName(lastName)
+                .build();
+    }
+
+    private static Author createAuthor(final String firstName, final String lastName, final String email) {
+        return ImmutableAuthor.builder()
+                .withId(UUID.randomUUID())
+                .withFirstName(firstName)
+                .withLastName(lastName)
+                .withEmail(email)
                 .build();
     }
 }
