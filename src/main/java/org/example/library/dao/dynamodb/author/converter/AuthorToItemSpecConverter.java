@@ -8,23 +8,8 @@ import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.google.common.collect.ImmutableList;
 import org.example.library.dao.dynamodb.author.AuthorAttributes;
 import org.example.library.models.Author;
-import org.example.library.models.ImmutableAuthor;
 
-import java.util.Optional;
-import java.util.UUID;
-
-public class AuthorToItemConverter {
-
-    public static Author toAuthor(final Item item) {
-        final ImmutableAuthor.Builder builder = ImmutableAuthor.builder()
-                .withId(UUID.fromString(item.getString(AuthorAttributes.ID.toString())))
-                .withFirstName(item.getString(AuthorAttributes.FIRST_NAME.toString()))
-                .withLastName(item.getString(AuthorAttributes.LAST_NAME.toString()))
-                .withDataVersion(item.getInt(AuthorAttributes.DATA_VERSION.toString()));
-        Optional.ofNullable(item.getString(AuthorAttributes.EMAIL.toString()))
-                .ifPresent(builder::withEmail);
-        return builder.build();
-    }
+public class AuthorToItemSpecConverter {
 
     public static PutItemSpec toPutItemSpec(final Author author) {
         final Item item = new Item()

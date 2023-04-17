@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 
-import static org.example.library.dao.dynamodb.author.converter.AuthorToItemConverter.toUpdateItemSpec;
+import static org.example.library.dao.dynamodb.author.converter.AuthorToItemSpecConverter.toUpdateItemSpec;
 import static org.example.library.testutils.AssertDdbObjects.assertDdbAttributeUpdates;
 import static org.example.library.testutils.AssertDdbObjects.assertDdbExpectedCondition;
 import static org.mockito.ArgumentMatchers.any;

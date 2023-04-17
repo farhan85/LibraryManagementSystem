@@ -13,7 +13,7 @@ import java.util.ConcurrentModificationException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.example.library.dao.dynamodb.author.converter.AuthorToItemConverter.toPutItemSpec;
+import static org.example.library.dao.dynamodb.author.converter.AuthorToItemSpecConverter.toPutItemSpec;
 
 public class AuthorCreator implements ResourceCreator<Author> {
 

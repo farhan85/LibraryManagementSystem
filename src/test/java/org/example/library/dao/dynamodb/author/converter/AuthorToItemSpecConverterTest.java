@@ -22,7 +22,7 @@ import static org.example.library.testutils.AssertDdbObjects.assertDdbAttributeU
 import static org.example.library.testutils.AssertDdbObjects.assertDdbExpectedCondition;
 import static org.testng.Assert.assertEquals;
 
-public class AuthorToItemConverterTest {
+public class AuthorToItemSpecConverterTest {
 
     private static final Author AUTHOR_NON_OPT = AuthorFactory.randomNonOptionals();
     private static final Author AUTHOR_FULL = AuthorFactory.random();
@@ -30,17 +30,6 @@ public class AuthorToItemConverterTest {
             ID.toString(), AUTHOR_NON_OPT.getId().value()).getComponents();
     private static final Collection<KeyAttribute> PRIMARY_KEY_COMPONENTS_FULL = new PrimaryKey(
             ID.toString(), AUTHOR_FULL.getId().value()).getComponents();
-    private static final Item AUTHOR_NON_OPT_ITEM = new Item()
-            .withString(ID.toString(), AUTHOR_NON_OPT.getId().value())
-            .withString(FIRST_NAME.toString(), AUTHOR_NON_OPT.getFirstName())
-            .withString(LAST_NAME.toString(), AUTHOR_NON_OPT.getLastName())
-            .withNumber(DATA_VERSION.toString(), AUTHOR_NON_OPT.getDataVersion());
-    private static final Item AUTHOR_FULL_ITEM = new Item()
-            .withString(ID.toString(), AUTHOR_FULL.getId().value())
-            .withString(FIRST_NAME.toString(), AUTHOR_FULL.getFirstName())
-            .withString(LAST_NAME.toString(), AUTHOR_FULL.getLastName())
-            .withNumber(DATA_VERSION.toString(), AUTHOR_FULL.getDataVersion())
-            .withString(EMAIL.toString(), AUTHOR_FULL.getEmail().orElseThrow().value());
     private static final PutItemSpec PUT_ITEM_SPEC_NON_OPT = new PutItemSpec()
             .withItem(new Item()
                     .withPrimaryKey(ID.toString(), AUTHOR_NON_OPT.getId().value())
@@ -73,32 +62,22 @@ public class AuthorToItemConverterTest {
             .withExpected(new Expected(DATA_VERSION.toString()).eq(AUTHOR_FULL.getDataVersion()));
 
     @Test
-    public void GIVEN_Item_with_non_optional_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
-        assertEquals(AuthorToItemConverter.toAuthor(AUTHOR_NON_OPT_ITEM), AUTHOR_NON_OPT);
-    }
-
-    @Test
-    public void GIVEN_Item_with_full_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
-        assertEquals(AuthorToItemConverter.toAuthor(AUTHOR_FULL_ITEM), AUTHOR_FULL);
-    }
-
-    @Test
     public void GIVEN_Author_with_non_optional_values_WHEN_calling_toPutItemSpec_THEN_return_expected_PutItemSpec() {
-        final PutItemSpec actual = AuthorToItemConverter.toPutItemSpec(AUTHOR_NON_OPT);
+        final PutItemSpec actual = AuthorToItemSpecConverter.toPutItemSpec(AUTHOR_NON_OPT);
         assertEquals(actual.getItem(), PUT_ITEM_SPEC_NON_OPT.getItem());
         assertDdbExpectedCondition(actual.getExpected(), PUT_ITEM_SPEC_NON_OPT.getExpected());
     }
 
     @Test
     public void GIVEN_Author_with_full_values_WHEN_calling_toPutItemSpec_THEN_return_expected_PutItemSpec() {
-        final PutItemSpec actual = AuthorToItemConverter.toPutItemSpec(AUTHOR_FULL);
+        final PutItemSpec actual = AuthorToItemSpecConverter.toPutItemSpec(AUTHOR_FULL);
         assertEquals(actual.getItem(), PUT_ITEM_SPEC_FULL.getItem());
         assertDdbExpectedCondition(actual.getExpected(), PUT_ITEM_SPEC_FULL.getExpected());
     }
 
     @Test
     public void GIVEN_Author_non_optional_values_WHEN_calling_toUpdateItemSpec_THEN_return_expected_UpdateItemSpec() {
-        final UpdateItemSpec actual = AuthorToItemConverter.toUpdateItemSpec(AUTHOR_NON_OPT);
+        final UpdateItemSpec actual = AuthorToItemSpecConverter.toUpdateItemSpec(AUTHOR_NON_OPT);
         assertEquals(actual.getKeyComponents(), PRIMARY_KEY_COMPONENTS_NON_OPT);
         assertDdbAttributeUpdates(actual.getAttributeUpdate(), UPDATE_ITEM_SPEC_NON_OPT.getAttributeUpdate());
         assertDdbExpectedCondition(actual.getExpected(), UPDATE_ITEM_SPEC_NON_OPT.getExpected());
@@ -106,7 +85,7 @@ public class AuthorToItemConverterTest {
 
     @Test
     public void GIVEN_Author_full_values_WHEN_calling_toUpdateItemSpec_THEN_return_expected_UpdateItemSpec() {
-        final UpdateItemSpec actual = AuthorToItemConverter.toUpdateItemSpec(AUTHOR_FULL);
+        final UpdateItemSpec actual = AuthorToItemSpecConverter.toUpdateItemSpec(AUTHOR_FULL);
         assertEquals(actual.getKeyComponents(), PRIMARY_KEY_COMPONENTS_FULL);
         assertDdbAttributeUpdates(actual.getAttributeUpdate(), UPDATE_ITEM_SPEC_FULL.getAttributeUpdate());
         assertDdbExpectedCondition(actual.getExpected(), UPDATE_ITEM_SPEC_FULL.getExpected());

@@ -12,7 +12,7 @@ import org.example.library.models.Author;
 import java.util.ConcurrentModificationException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.example.library.dao.dynamodb.author.converter.AuthorToItemConverter.toUpdateItemSpec;
+import static org.example.library.dao.dynamodb.author.converter.AuthorToItemSpecConverter.toUpdateItemSpec;
 
 public class AuthorUpdater implements ResourceUpdater<Author> {
 
