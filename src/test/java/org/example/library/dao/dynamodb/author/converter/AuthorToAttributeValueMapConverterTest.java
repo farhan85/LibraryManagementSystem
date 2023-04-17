@@ -1,11 +1,15 @@
 package org.example.library.dao.dynamodb.author.converter;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.google.common.base.Converter;
 import com.google.common.collect.ImmutableMap;
 import org.example.library.dao.dynamodb.author.AuthorAttributes;
 import org.example.library.models.Author;
 import org.example.library.testutils.AuthorFactory;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 
@@ -25,23 +29,30 @@ public class AuthorToAttributeValueMapConverterTest {
             AuthorAttributes.DATA_VERSION.toString(), new AttributeValue().withN(Integer.toString(AUTHOR_FULL.getDataVersion())),
             AuthorAttributes.EMAIL.toString(), new AttributeValue().withS(AUTHOR_FULL.getEmail().orElseThrow().value()));
 
+    private Converter<Author, Map<String, AttributeValue>> authorConverter;
+
+    @BeforeMethod
+    public void setup() {
+        authorConverter = new AuthorToAttributeValueMapConverter();
+    }
+
     @Test
     public void GIVEN_AttributeValueMap_with_no_optional_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
-        assertEquals(AuthorToAttributeValueMapConverter.toAuthor(AUTHOR_MAP_NON_OPT), AUTHOR_NON_OPT);
+        assertEquals(authorConverter.reverse().convert(AUTHOR_MAP_NON_OPT), AUTHOR_NON_OPT);
     }
 
     @Test
     public void GIVEN_AttributeValueMap_with_full_Author_values_WHEN_calling_toAuthor_THEN_return_expected_Author() {
-        assertEquals(AuthorToAttributeValueMapConverter.toAuthor(AUTHOR_MAP_FULL), AUTHOR_FULL);
+        assertEquals(authorConverter.reverse().convert(AUTHOR_MAP_FULL), AUTHOR_FULL);
     }
 
     @Test
     public void GIVEN_Author_with_no_optional_values_WHEN_calling_toAttributeValueMap_THEN_return_expected_AttributeValue() {
-        assertEquals(AuthorToAttributeValueMapConverter.toAttributeValueMap(AUTHOR_NON_OPT), AUTHOR_MAP_NON_OPT);
+        assertEquals(authorConverter.convert(AUTHOR_NON_OPT), AUTHOR_MAP_NON_OPT);
     }
 
     @Test
     public void GIVEN_Author_with_full_values_WHEN_calling_toAttributeValueMap_THEN_return_expected_AttributeValue() {
-        assertEquals(AuthorToAttributeValueMapConverter.toAttributeValueMap(AUTHOR_FULL), AUTHOR_MAP_FULL);
+        assertEquals(authorConverter.convert(AUTHOR_FULL), AUTHOR_MAP_FULL);
     }
 }
