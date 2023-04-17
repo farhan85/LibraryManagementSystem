@@ -10,23 +10,26 @@ import org.example.library.dao.ResourceUpdater;
 import org.example.library.models.Author;
 
 import java.util.ConcurrentModificationException;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.example.library.dao.dynamodb.author.converter.AuthorToItemSpecConverter.toUpdateItemSpec;
 
 public class AuthorUpdater implements ResourceUpdater<Author> {
 
     private final Table authorsTable;
+    private final Function<Author, UpdateItemSpec> authorToUpdateItemSpecConverter;
 
     @Inject
-    public AuthorUpdater(@Named("AuthorsTable") final Table authorsTable) {
+    public AuthorUpdater(@Named("AuthorsTable") final Table authorsTable,
+                         final Function<Author, UpdateItemSpec> authorToUpdateItemSpecConverter) {
         this.authorsTable = checkNotNull(authorsTable);
+        this.authorToUpdateItemSpecConverter = checkNotNull(authorToUpdateItemSpecConverter);
     }
 
     @Override
     public void update(final Author author) {
         try {
-            final UpdateItemSpec updateItemSpec = toUpdateItemSpec(author)
+            final UpdateItemSpec updateItemSpec = authorToUpdateItemSpecConverter.apply(author)
                     .withReturnValues(ReturnValue.NONE);
             authorsTable.updateItem(updateItemSpec);
         } catch (final ConditionalCheckFailedException e) {
