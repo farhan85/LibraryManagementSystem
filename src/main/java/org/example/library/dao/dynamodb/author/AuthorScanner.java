@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
-import com.google.common.base.Converter;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import dev.failsafe.RateLimiter;
@@ -13,6 +12,7 @@ import org.example.library.models.Author;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,17 +23,17 @@ public class AuthorScanner implements ResourceScanner<Author> {
     private final AmazonDynamoDB dynamoDb;
     private final String tableName;
     private final RateLimiter<Object> rateLimiter;
-    private final Converter<Author, Map<String, AttributeValue>> authorConverter;
+    private final Function<Map<String, AttributeValue>, Author> attributeMapToAuthorConverter;
 
     @Inject
     public AuthorScanner(final AmazonDynamoDB dynamoDb,
                          @Named("AuthorsTableName") final String tableName,
                          @Named("AuthorsTableRateLimiter") final RateLimiter<Object> rateLimiter,
-                         final Converter<Author, Map<String, AttributeValue>> authorConverter) {
+                         final Function<Map<String, AttributeValue>, Author> attributeMapToAuthorConverter) {
         this.dynamoDb = checkNotNull(dynamoDb);
         this.tableName = checkNotNull(tableName);
         this.rateLimiter = checkNotNull(rateLimiter);
-        this.authorConverter = checkNotNull(authorConverter);
+        this.attributeMapToAuthorConverter = checkNotNull(attributeMapToAuthorConverter);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class AuthorScanner implements ResourceScanner<Author> {
 
                 result.getItems()
                         .stream()
-                        .map(authorConverter.reverse()::convert)
+                        .map(attributeMapToAuthorConverter)
                         .forEach(consumer);
             }
         } while (exclusiveStartKey != null);

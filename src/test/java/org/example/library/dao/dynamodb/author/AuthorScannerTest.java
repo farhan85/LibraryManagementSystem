@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
-import com.google.common.base.Converter;
 import dev.failsafe.RateLimiter;
 import org.example.library.models.Author;
 import org.example.library.testutils.AuthorFactory;
@@ -17,6 +16,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
@@ -37,9 +37,7 @@ public class AuthorScannerTest {
     @Mock
     private Map<String, AttributeValue> mockExclusiveStartKey;
     @Mock
-    private Converter<Author, Map<String, AttributeValue>> mockAuthorConverter;
-    @Mock
-    private Converter<Map<String, AttributeValue>, Author> mockDdbItemConverter;
+    private Function<Map<String, AttributeValue>, Author> mockDdbItemConverter;
     @Mock
     private Map<String, AttributeValue> mockAuthor1Item;
     @Mock
@@ -68,11 +66,10 @@ public class AuthorScannerTest {
         when(mockAmazonDynamoDB.scan(scanRequest1)).thenReturn(scanResult1);
         when(mockAmazonDynamoDB.scan(scanRequest2)).thenReturn(scanResult2);
         when(mockRateLimiter.tryAcquirePermit()).thenReturn(true);
-        when(mockAuthorConverter.reverse()).thenReturn(mockDdbItemConverter);
-        when(mockDdbItemConverter.convert(mockAuthor1Item)).thenReturn(AUTHOR_1);
-        when(mockDdbItemConverter.convert(mockAuthor2Item)).thenReturn(AUTHOR_2);
-        when(mockDdbItemConverter.convert(mockAuthor3Item)).thenReturn(AUTHOR_3);
-        authorScanner = new AuthorScanner(mockAmazonDynamoDB, TABLE_NAME, mockRateLimiter, mockAuthorConverter);
+        when(mockDdbItemConverter.apply(mockAuthor1Item)).thenReturn(AUTHOR_1);
+        when(mockDdbItemConverter.apply(mockAuthor2Item)).thenReturn(AUTHOR_2);
+        when(mockDdbItemConverter.apply(mockAuthor3Item)).thenReturn(AUTHOR_3);
+        authorScanner = new AuthorScanner(mockAmazonDynamoDB, TABLE_NAME, mockRateLimiter, mockDdbItemConverter);
     }
 
     @Test

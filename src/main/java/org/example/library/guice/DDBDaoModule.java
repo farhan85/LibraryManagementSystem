@@ -2,7 +2,6 @@ package org.example.library.guice;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.google.common.base.Converter;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import org.example.library.dao.ResourceCreator;
@@ -17,7 +16,7 @@ import org.example.library.dao.dynamodb.author.AuthorDeleter;
 import org.example.library.dao.dynamodb.author.AuthorRetriever;
 import org.example.library.dao.dynamodb.author.AuthorScanner;
 import org.example.library.dao.dynamodb.author.AuthorUpdater;
-import org.example.library.dao.dynamodb.author.converter.AuthorToAttributeValueMapConverter;
+import org.example.library.dao.dynamodb.author.converter.AttributeValueMapToAuthorConverter;
 import org.example.library.dao.dynamodb.author.converter.ItemToAuthorConverter;
 import org.example.library.models.Author;
 import org.example.library.models.AuthorId;
@@ -34,7 +33,7 @@ public class DDBDaoModule extends AbstractModule {
     private final TypeLiteral<ResourceScanner<Author>> AUTHOR_RESOURCE_SCANNER = new TypeLiteral<>() {};
     private final TypeLiteral<ResourceDao<AuthorId, Author>> AUTHOR_RESOURCE_DAO = new TypeLiteral<>() {};
     private final TypeLiteral<ResourceDaoDelegator<AuthorId, Author>> AUTHOR_RESOURCE_DAO_DELEGATOR = new TypeLiteral<>() {};
-    private final TypeLiteral<Converter<Author, Map<String, AttributeValue>>> AUTHOR_TO_ATTR_VALUE_MAP_CONVERTER = new TypeLiteral<>() {};
+    private final TypeLiteral<Function<Map<String, AttributeValue>, Author>> ATTR_VALUE_MAP_TO_AUTHOR_CONVERTER = new TypeLiteral<>() {};
     private final TypeLiteral<Function<Item, Author>> DDB_ITEM_TO_AUTHOR_CONVERTER = new TypeLiteral<>() {};
 
     @Override
@@ -45,7 +44,7 @@ public class DDBDaoModule extends AbstractModule {
         bind(AUTHOR_RESOURCE_RETRIEVER).to(AuthorRetriever.class);
         bind(AUTHOR_RESOURCE_SCANNER).to(AuthorScanner.class);
         bind(AUTHOR_RESOURCE_DAO).to(AUTHOR_RESOURCE_DAO_DELEGATOR);
-        bind(AUTHOR_TO_ATTR_VALUE_MAP_CONVERTER).to(AuthorToAttributeValueMapConverter.class);
+        bind(ATTR_VALUE_MAP_TO_AUTHOR_CONVERTER).to(AttributeValueMapToAuthorConverter.class);
         bind(DDB_ITEM_TO_AUTHOR_CONVERTER).to(ItemToAuthorConverter.class);
     }
 }
