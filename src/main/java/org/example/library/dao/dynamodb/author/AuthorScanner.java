@@ -28,7 +28,7 @@ public class AuthorScanner implements ResourceScanner<Author> {
     @Inject
     public AuthorScanner(final AmazonDynamoDB dynamoDb,
                          @Named("AuthorsTableName") final String tableName,
-                         @Named("AuthorsTableRateLimiter") final RateLimiter<Object> rateLimiter,
+                         final RateLimiter<Object> rateLimiter,
                          final Function<Map<String, AttributeValue>, Author> attributeMapToAuthorConverter) {
         this.dynamoDb = checkNotNull(dynamoDb);
         this.tableName = checkNotNull(tableName);

@@ -51,7 +51,6 @@ public class AwsClientModule extends AbstractModule {
     }
 
     @Provides
-    @Named("AuthorsTableRateLimiter")
     public RateLimiter<Object> provideAuthorsTableRateLimiter() {
         return RateLimiter.smoothBuilder(5, Duration.ofSeconds(1))
                 .withMaxWaitTime(Duration.ofSeconds(10))
