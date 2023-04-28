@@ -14,8 +14,6 @@ import static org.mockito.Mockito.verify;
 @Listeners(MockitoTestNGListener.class)
 public class AuthorDeleterTest {
 
-    private static final Author AUTHOR = AuthorFactory.random();
-
     @Mock
     private Table mockAuthorsTable;
 
@@ -27,16 +25,9 @@ public class AuthorDeleterTest {
     }
 
     @Test
-    public void GIVEN_uuid_WHEN_calling_delete_THEN_call_table_deleteItem_with_expected_arguments() {
-        authorDeleter.delete(AUTHOR.getId());
-
-        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), AUTHOR.getId().value());
-    }
-
-    @Test
-    public void GIVEN_Author_WHEN_calling_delete_THEN_call_table_deleteItem_with_expected_arguments() {
-        authorDeleter.delete(AUTHOR.getId());
-
-        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), AUTHOR.getId().value());
+    public void GIVEN_authorId_WHEN_calling_delete_THEN_call_table_deleteItem_with_expected_arguments() {
+        final Author author = AuthorFactory.random();
+        authorDeleter.delete(author.getId());
+        verify(mockAuthorsTable).deleteItem(AuthorAttributes.ID.toString(), author.getId().value());
     }
 }

@@ -9,7 +9,6 @@ import com.google.inject.name.Named;
 import org.example.library.dao.ResourceCreator;
 import org.example.library.models.Author;
 
-import java.util.ConcurrentModificationException;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -35,7 +34,7 @@ public class AuthorCreator implements ResourceCreator<Author> {
                     .withReturnValues(ReturnValue.NONE);
             authorsTable.putItem(putItemSpec);
         } catch (final ConditionalCheckFailedException e) {
-            throw new ConcurrentModificationException(
+            throw new RuntimeException(
                     String.format("Author already exists. AuthorId=%s", author.getId().value()),
                     e);
         }

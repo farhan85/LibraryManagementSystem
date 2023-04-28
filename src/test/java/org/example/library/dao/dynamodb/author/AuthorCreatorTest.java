@@ -2,6 +2,7 @@ package org.example.library.dao.dynamodb.author;
 
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.PutItemSpec;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 import org.example.library.models.Author;
 import org.example.library.models.ImmutableAuthor;
@@ -14,6 +15,7 @@ import org.testng.annotations.Test;
 
 import java.util.function.Function;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,15 +35,15 @@ public class AuthorCreatorTest {
 
     @BeforeMethod
     public void setup() {
+
+        when(mockAuthorToPutItemSpecConverter.apply(AUTHOR)).thenReturn(mockPutItemSpec);
+        when(mockPutItemSpec.withReturnValues(ReturnValue.NONE)).thenReturn(mockPutItemSpec);
         authorCreator = new AuthorCreator(mockAuthorsTable, mockAuthorToPutItemSpecConverter);
     }
 
     @Test
     public void GIVEN_Author_WHEN_calling_create_THEN_call_table_putItem_with_expected_arguments() {
-        when(mockAuthorToPutItemSpecConverter.apply(AUTHOR)).thenReturn(mockPutItemSpec);
-        when(mockPutItemSpec.withReturnValues(ReturnValue.NONE)).thenReturn(mockPutItemSpec);
         authorCreator.create(AUTHOR);
-
         verify(mockPutItemSpec).withReturnValues(ReturnValue.NONE);
         verify(mockAuthorsTable).putItem(mockPutItemSpec);
     }
@@ -53,4 +55,9 @@ public class AuthorCreatorTest {
         authorCreator.create(author);
     }
 
+    @Test(expectedExceptions = RuntimeException.class)
+    public void GIVEN_Table_throws_ConditionalCheckFailedException_WHEN_calling_create_THEN_throw_RuntimeException() {
+        doThrow(ConditionalCheckFailedException.class).when(mockAuthorsTable).putItem(mockPutItemSpec);
+        authorCreator.create(AUTHOR);
+    }
 }

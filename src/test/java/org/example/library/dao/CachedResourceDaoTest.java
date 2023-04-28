@@ -13,10 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 
 @Listeners(MockitoTestNGListener.class)
@@ -52,6 +49,18 @@ public class CachedResourceDaoTest {
 
         assertEquals(actual, Optional.of(expected));
         verify(mockResourceDao).create(expected);
+        verifyNoMoreInteractions(mockResourceDao);
+    }
+
+    @Test
+    public void GIVEN_resourceDao_throw_exception_WHEN_calling_get_THEN_return_empty_optional() {
+        final TestResource testResource = TestResource.of(TestResourceId.random(), 1);
+        final TestResourceId uuid = testResource.getId();
+        final int dataVersion = testResource.getDataVersion();
+        doThrow(RuntimeException.class).when(mockResourceDao)
+                .get(uuid, dataVersion);
+
+        assertEquals(cachedResourceDao.get(uuid, dataVersion), Optional.empty());
         verifyNoMoreInteractions(mockResourceDao);
     }
 

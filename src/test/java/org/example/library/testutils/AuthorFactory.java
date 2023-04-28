@@ -11,6 +11,8 @@ import java.util.UUID;
 public final class AuthorFactory {
 
     private static final Random RANDOM = new Random();
+    private static final int MIN_DATA_VERSION = 1;
+    private static final int MAX_DATA_VERSION = 1000;
 
     private static final List<String> FIRST_NAMES = List.of(
             "Aaron", "Alice", "Anthony", "Ben", "Daniel", "Dylan", "Elizabeth", "Emily", "Emma", "Hannah",
@@ -42,7 +44,7 @@ public final class AuthorFactory {
                 .withId(ImmutableAuthorId.of(UUID.randomUUID()))
                 .withFirstName(FIRST_NAMES.get(RANDOM.nextInt(FIRST_NAMES.size())))
                 .withLastName(LAST_NAMES.get(RANDOM.nextInt(LAST_NAMES.size())))
-                .withDataVersion(RANDOM.nextInt())
+                .withDataVersion(RANDOM.nextInt(MIN_DATA_VERSION, MAX_DATA_VERSION))
                 .build();
     }
 }
