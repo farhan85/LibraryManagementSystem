@@ -14,3 +14,17 @@ Resources:
         - AttributeName: Id
           KeyType: HASH
       TableName: Authors
+
+  BooksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+      TableName: Books
