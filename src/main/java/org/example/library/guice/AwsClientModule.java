@@ -29,6 +29,7 @@ public class AwsClientModule extends AbstractModule {
     @Override
     protected void configure() {
         bindConstant().annotatedWith(Names.named("AuthorsTableName")).to("Authors");
+        bindConstant().annotatedWith(Names.named("BooksTableName")).to("Books");
     }
 
     @Provides
@@ -47,6 +48,12 @@ public class AwsClientModule extends AbstractModule {
     @Provides
     @Named("AuthorsTable")
     public Table provideAuthorsTable(final DynamoDB dynamoDb, @Named("AuthorsTableName") final String tableName) {
+        return dynamoDb.getTable(tableName);
+    }
+
+    @Provides
+    @Named("BooksTable")
+    public Table provideBooksTable(final DynamoDB dynamoDb, @Named("BooksTableName") final String tableName) {
         return dynamoDb.getTable(tableName);
     }
 
